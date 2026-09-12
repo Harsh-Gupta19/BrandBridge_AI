@@ -1,0 +1,37 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/coverage/
+
+# Data and model outputs
+backend/app/ml/artifacts/*
+!backend/app/ml/artifacts/README.md
+data/raw/
+data/processed/
+*.parquet
+*.pkl
+*.joblib
+
+# Local tooling
+.DS_Store
+.idea/
+.vscode/
+
+# Docker
+*.log

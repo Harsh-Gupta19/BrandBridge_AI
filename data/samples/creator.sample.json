@@ -1,0 +1,24 @@
+{
+  "creatorId": "CR001",
+  "name": "Aarav Fitness",
+  "location": "Mumbai",
+  "categories": ["fitness", "nutrition"],
+  "platforms": {
+    "instagram": {
+      "followers": 85000,
+      "engagementRate": 5.8
+    },
+    "youtube": {
+      "subscribers": 42000,
+      "averageViews": 18000
+    }
+  },
+  "audience": {
+    "ageRange": "18-30",
+    "primaryCountry": "India"
+  },
+  "rateCard": {
+    "instagramReel": 7000,
+    "youtubeShort": 9000
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "campaignId": "CMP001",
+  "brand": "HealthyBite",
+  "title": "Protein Snack Launch",
+  "category": "health_fitness",
+  "budget": 50000,
+  "country": "India",
+  "targetAge": "18-30",
+  "platforms": ["instagram", "youtube"],
+  "contentTypes": ["reel", "short"],
+  "creatorCategories": ["fitness", "nutrition"]
+}
