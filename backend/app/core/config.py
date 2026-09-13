@@ -29,6 +29,32 @@ class Settings(BaseSettings):
 
     google_client_id: str | None = None
     google_client_secret: str | None = None
+    youtube_api_key: str | None = None
+    youtube_region_code: str = "IN"
+    youtube_language_code: str = "en"
+    youtube_max_creators: int = 100
+    youtube_max_videos_per_creator: int = 20
+    youtube_search_pages_per_query: int = 1
+    youtube_request_delay_seconds: float = 0.1
+    youtube_search_queries: list[str] = Field(
+        default_factory=lambda: [
+            "fitness India",
+            "nutrition India",
+            "gym India",
+            "beauty India",
+            "skincare India",
+            "makeup India",
+            "technology India",
+            "smartphone India",
+            "gaming India",
+            "food India",
+            "cooking India",
+            "travel India",
+            "fashion India",
+            "finance India",
+            "education India",
+        ]
+    )
 
     meta_app_id: str | None = None
     meta_app_secret: str | None = None
@@ -49,6 +75,23 @@ class Settings(BaseSettings):
                 return [str(origin) for origin in parsed]
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         raise ValueError("CORS_ORIGINS must be a comma-separated string or list")
+
+    @field_validator("youtube_search_queries", mode="before")
+    @classmethod
+    def parse_youtube_search_queries(cls, value: str | list[str]) -> list[str]:
+        if isinstance(value, list):
+            return [str(query).strip() for query in value if str(query).strip()]
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return []
+            if value.startswith("["):
+                parsed = json.loads(value)
+                if not isinstance(parsed, list):
+                    raise ValueError("YOUTUBE_SEARCH_QUERIES JSON value must be a list")
+                return [str(query).strip() for query in parsed if str(query).strip()]
+            return [query.strip() for query in value.split(",") if query.strip()]
+        raise ValueError("YOUTUBE_SEARCH_QUERIES must be a comma-separated string or list")
 
 
 @lru_cache

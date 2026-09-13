@@ -22,7 +22,13 @@ frontend/coverage/
 # Data and model outputs
 backend/app/ml/artifacts/*
 !backend/app/ml/artifacts/README.md
-data/raw/
+data/raw/*
+!data/raw/
+!data/raw/README.md
+data/raw/youtube/*
+!data/raw/youtube/
+!data/raw/youtube/README.md
+!data/raw/youtube/*.json
 data/processed/
 *.parquet
 *.pkl
