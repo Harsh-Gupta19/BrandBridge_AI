@@ -29,6 +29,10 @@ data/raw/youtube/*
 !data/raw/youtube/
 !data/raw/youtube/README.md
 !data/raw/youtube/*.json
+data/raw/bsky/*
+!data/raw/bsky/
+!data/raw/bsky/README.md
+!data/raw/bsky/*.json
 data/processed/
 *.parquet
 *.pkl
