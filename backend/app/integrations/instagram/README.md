@@ -1,9 +1,35 @@
-# Instagram Integration
+# Instagram Data Collector
 
-Future responsibility:
+The **Instagram Data Collector** is a data collection component of the **BrandBridge AI** project.
 
-- OAuth authorization
-- Professional creator or business account connections
-- Permitted profile and insight information
+It connects to the **Instagram Graph API** using the **Instagram Login** authentication flow and collects data from an authorized **Instagram Professional Business account**.
 
-The platform must continue working when Instagram APIs are unavailable. Instagram data should enrich matching, not block core creator-brand collaboration flows.
+The collected data is stored in JSON format and is intended to support creator profiling, feature engineering, semantic analysis, and creator–brand matching.
+
+---
+
+## Account Type Used
+
+For the current implementation of BrandBridge AI, we are using an:
+
+> **Instagram Professional Business Account**
+
+The Business Professional account is connected to our Meta application and authorized through the Instagram API.
+
+```text
+Instagram Professional Business Account
+                 │
+                 ▼
+          Meta Developer App
+                 │
+                 ▼
+       Instagram Login / OAuth
+                 │
+                 ▼
+          Access Token
+                 │
+                 ▼
+       Instagram Graph API
+                 │
+                 ▼
+       BrandBridge Collector
