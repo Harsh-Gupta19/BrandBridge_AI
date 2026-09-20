@@ -1,0 +1,64 @@
+{
+  "source": "YouTube Analytics API",
+  "api_version": "v2",
+  "channel": "channel==MINE",
+  "start_date": "2026-08-21",
+  "end_date": "2026-09-20",
+  "report": {
+    "kind": "youtubeAnalytics#resultTable",
+    "columnHeaders": [
+      {
+        "name": "views",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "likes",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "comments",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "shares",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "estimatedMinutesWatched",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "averageViewDuration",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "subscribersGained",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "subscribersLost",
+        "columnType": "METRIC",
+        "dataType": "INTEGER"
+      }
+    ],
+    "rows": [
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  }
+}
