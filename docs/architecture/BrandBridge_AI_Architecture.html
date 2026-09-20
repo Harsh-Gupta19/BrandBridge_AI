@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BrandBridge AI — End-to-End Technical Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: #334155;
+      --accent: #38bdf8;
+      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      --badge-bg: rgba(56, 189, 248, 0.1);
+      --badge-border: rgba(56, 189, 248, 0.3);
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .header-content h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-content p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 700px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #334155;
+      border-color: #475569;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      border: none;
+      color: #0f172a;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      color: #0f172a;
+    }
+
+    .section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--card-shadow);
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .diagram-container {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    .diagram-container .mermaid {
+      width: 100%;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: rgba(15, 23, 42, 0.6);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 0.2rem 0.45rem;
+      border-radius: 5px;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .status-active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-planned {
+      background: rgba(234, 179, 8, 0.15);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.3);
+    }
+
+    @media print {
+      body {
+        background-color: #ffffff;
+        color: #0f172a;
+        padding: 0;
+      }
+      .actions, header .btn {
+        display: none !important;
+      }
+      .section {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: none;
+        margin-bottom: 2rem;
+        page-break-inside: avoid;
+      }
+      .diagram-container {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+      }
+      .header-content h1 {
+        background: none;
+        -webkit-text-fill-color: #0f172a;
+        color: #0f172a;
+      }
+      table th {
+        background: #f1f5f9;
+        color: #334155;
+      }
+      table td {
+        border-color: #e2e8f0;
+        color: #0f172a;
+      }
+      code {
+        background: #f1f5f9;
+        color: #0284c7;
+        border-color: #cbd5e1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <h1>BrandBridge AI</h1>
+        <p>End-to-End Technical Implementation Architecture & Workflow Specification</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="window.print()">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+            <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+          </svg>
+          Export / Print PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- SECTION 1 -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">1. High-Level System Overview</h2>
+        <span class="badge">Full Stack Topology</span>
+      </div>
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TB
+    subgraph Client["🖥️ Client Layer"]
+        Browser["User Browser"]
+    end
+
+    subgraph Frontend["⚛️ React Frontend (Vite + TypeScript) — :5173"]
+        Pages["Pages<br/>Home · Login · Register<br/>Creators · Brands<br/>Campaigns · Proposals<br/>Recommendations"]
+        Components["Shared UI Components"]
+        Hooks["Custom React Hooks"]
+        Services_FE["API Services (TanStack Query)"]
+        Router["React Router DOM"]
+    end
+
+    subgraph Backend["🐍 FastAPI Backend (Python 3.12) — :8000"]
+        direction TB
+        API["API Layer<br/>/api/v1/* Routes"]
+        SVC["Service Layer (Business Logic)"]
+        REPO["Repository Layer (SQLAlchemy 2)"]
+        Core["Core<br/>Config · Security (JWT) · Logging"]
+
+        subgraph AI_Module["🤖 AI / Agentic Module"]
+            Agents["LangGraph Agents<br/>Creator Matching Graph"]
+            LLM["LangChain LLM<br/>Provider Abstraction"]
+            RAG["RAG Engine<br/>Brand Guidelines · Briefs"]
+            Embeddings["Embeddings Engine<br/>(sentence-transformers)"]
+            Prompts["Prompt Templates"]
+            Tools["Agent Tools<br/>search_creators · fetch_stats<br/>calc_similarity · explain_match"]
+        end
+
+        subgraph ML_Module["📊 ML Module"]
+            Features["Feature Engineering"]
+            Training["Model Training<br/>LogReg · RF · XGBoost"]
+            Inference["Inference / Scoring"]
+            Evaluation["Model Evaluation"]
+            Artifacts["Model Artifacts"]
+        end
+
+        subgraph Integrations["🔌 Social Media Collectors"]
+            YouTube["YouTube Data Collector"]
+            Instagram["Instagram Collector<br/>+ Creator Collector"]
+            Bluesky["Bluesky AT Protocol Collector"]
+        end
+    end
+
+    subgraph Data["💾 Persistence Layer"]
+        PG["PostgreSQL 16<br/>+ pgvector<br/>:5432"]
+        Alembic["Alembic Migrations"]
+    end
+
+    subgraph External["🌐 External Services"]
+        YT_API["YouTube Data API"]
+        IG_API["Instagram / Meta Graph API"]
+        BSky_API["Bluesky AT Protocol API"]
+        LLM_API["LLM Provider (OpenAI / Gemini)"]
+    end
+
+    Browser --> Frontend
+    Pages --> Router
+    Pages --> Components
+    Pages --> Hooks
+    Hooks --> Services_FE
+    Services_FE -->|"REST API"| API
+    API --> Core
+    API --> SVC
+    SVC --> REPO
+    SVC --> AI_Module
+    SVC --> ML_Module
+    REPO --> PG
+    Alembic --> PG
+
+    Agents --> Tools
+    Agents --> LLM
+    Tools --> REPO
+    Tools --> ML_Module
+    Tools --> RAG
+    RAG --> Embeddings
+    Embeddings --> PG
+    LLM --> Prompts
+    LLM -->|"HTTP REST"| LLM_API
+
+    YouTube -->|"API"| YT_API
+    Instagram -->|"API"| IG_API
+    Bluesky -->|"API"| BSky_API
+        </pre>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">2. Detailed Backend Module Architecture</h2>
+        <span class="badge">Modular Monolith</span>
+      </div>
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph API_Layer["API Layer (FastAPI)"]
+        R_Health["/health"]
+        R_V1["/api/v1/*"]
+        R_V1_Endpoints["Endpoint Routers"]
+    end
+
+    subgraph Schemas["Pydantic Schemas"]
+        S_User["UserSchema"]
+        S_Brand["BrandProfileSchema"]
+        S_Creator["CreatorProfileSchema"]
+        S_Campaign["CampaignSchema"]
+        S_Proposal["ProposalSchema"]
+        S_Enums["Enums"]
+    end
+
+    subgraph Services_Layer["Service Layer"]
+        SVC_Health["HealthService"]
+        SVC_Biz["Business Services"]
+    end
+
+    subgraph Repo_Layer["Repository Layer"]
+        REPO_Base["Base Repository (SQLAlchemy 2)"]
+    end
+
+    subgraph Models_Layer["SQLAlchemy Models"]
+        M_User["User"]
+        M_Brand["BrandProfile"]
+        M_Creator["CreatorProfile"]
+        M_Campaign["Campaign"]
+        M_Proposal["Proposal"]
+    end
+
+    subgraph DB["PostgreSQL + pgvector"]
+        Tables["Tables + Vector Embeddings"]
+    end
+
+    R_V1 --> R_V1_Endpoints
+    R_V1_Endpoints -->|"Validate / Serialize"| Schemas
+    R_V1_Endpoints --> Services_Layer
+    Services_Layer --> Repo_Layer
+    Repo_Layer --> Models_Layer
+    Models_Layer --> DB
+        </pre>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">3. LangGraph Agent Workflow (Creator Matching)</h2>
+        <span class="badge">Agentic Pipeline</span>
+      </div>
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    START(("🟢 START"))
+    N1["1. Parse Campaign Brief<br/>Extract requirements & goals"]
+    N2["2. Validate Requirements<br/>Check budget, niche & constraints"]
+    N3["3. Search Creator Pool<br/>Filter DB by base criteria"]
+    N4["4. Gather Live Metrics<br/>YouTube · Instagram · Bluesky stats"]
+    N5["5. Calculate ML Score<br/>XGBoost tabular feature model"]
+    N6["6. Calculate Semantic Score<br/>Vector similarity via pgvector"]
+    N7["7. Ensemble Ranking<br/>Combine tabular & semantic scores"]
+    N8["8. Retrieve Brand Knowledge<br/>RAG lookup of brand guidelines"]
+    N9["9. Generate Explanation<br/>LLM synthesizes matching rationale"]
+    HUMAN{"👤 Human Approval Gate<br/>Brand reviews recommendation"}
+    N10["10. Draft Proposal<br/>Generate collaboration proposal"]
+    END_NODE(("🔴 END"))
+
+    START --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    N8 --> N9
+    N9 --> HUMAN
+    HUMAN -->|"Approved"| N10
+    HUMAN -->|"Refine / Reject"| N7
+    N10 --> END_NODE
+        </pre>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">4. Data Flow: End-to-End Request Lifecycle</h2>
+        <span class="badge">Sequence Flow</span>
+      </div>
+      <div class="diagram-container">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as 🖥️ Browser
+    participant FE as ⚛️ React Frontend
+    participant API as 🐍 FastAPI Route
+    participant SVC as Service Layer
+    participant Agent as 🤖 LangGraph Agent
+    participant ML as 📊 ML Module
+    participant RAG as 📚 RAG Engine
+    participant LLM as 🧠 LLM Provider
+    participant DB as 💾 PostgreSQL + pgvector
+    participant Social as 🔌 Social APIs
+
+    U->>FE: Submits campaign brief & clicks "Find Creators"
+    FE->>API: POST /api/v1/recommendations
+    API->>SVC: create_recommendations()
+    SVC->>Agent: creator_matching_graph.invoke()
+
+    Agent->>DB: Search candidate creators (SQL + pgvector)
+    DB-->>Agent: Creator candidates pool
+
+    Agent->>Social: Fetch live social statistics
+    Social-->>Agent: YouTube/Instagram/Bluesky metrics
+
+    Agent->>ML: calculate_ml_match()
+    ML-->>Agent: ML compatibility scores
+
+    Agent->>DB: Semantic similarity search (pgvector)
+    DB-->>Agent: Embedding cosine distances
+
+    Agent->>RAG: Retrieve brand guidelines
+    RAG->>DB: Vector search on guideline chunks
+    DB-->>RAG: Relevant guideline text
+    RAG-->>Agent: Context for explanation
+
+    Agent->>LLM: Generate explanation
+    LLM-->>Agent: Human-readable rationale
+
+    Agent-->>SVC: Ranked results + explanations
+    SVC-->>API: Response payload
+    API-->>FE: JSON response
+    FE-->>U: Display creator recommendation cards
+
+    Note over U, FE: Human-in-the-Loop Step
+    U->>FE: Approve match & click "Send Proposal"
+    FE->>API: POST /api/v1/proposals
+    API->>SVC: create_proposal()
+    SVC->>DB: Save proposal (status: PENDING)
+    DB-->>SVC: Persisted
+    SVC-->>API: Proposal created
+    API-->>FE: 201 Created
+    FE-->>U: Display proposal confirmation
+        </pre>
+      </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">5. Infrastructure & Deployment (Docker Compose)</h2>
+        <span class="badge">Container Topology</span>
+      </div>
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TB
+    subgraph Docker["🐳 Docker Compose Environment"]
+        subgraph FE_Container["brandbridge-frontend (:5173)"]
+            Vite["Vite Dev Server<br/>React 18 + TypeScript"]
+        end
+        subgraph BE_Container["brandbridge-backend (:8000)"]
+            Uvicorn["Uvicorn ASGI<br/>FastAPI Modular Monolith"]
+        end
+        subgraph DB_Container["brandbridge-postgres (:5432)"]
+            PGVector["pgvector/pgvector:pg16<br/>PostgreSQL 16 + pgvector"]
+        end
+    end
+
+    subgraph Volumes["📦 Persistent Volumes"]
+        PG_Data["postgres_data"]
+    end
+
+    subgraph CI["🔄 CI/CD (GitHub Actions)"]
+        Lint["Lint (Ruff + ESLint)"]
+        Test["Test (pytest + Vitest)"]
+        Build["Build Verification"]
+    end
+
+    FE_Container -->|"REST API<br/>VITE_API_BASE_URL"| BE_Container
+    BE_Container -->|"psycopg<br/>DATABASE_URL"| DB_Container
+    DB_Container --> PG_Data
+    BE_Container -->|"depends_on<br/>service_healthy"| DB_Container
+    FE_Container -->|"depends_on<br/>service_healthy"| BE_Container
+        </pre>
+      </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">6. Project Module Map</h2>
+        <span class="badge">Implementation Status</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Module</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Frontend</strong></td>
+            <td>React App Shell</td>
+            <td><code>frontend/src/</code></td>
+            <td><span class="status-badge status-active">● Active Shell</span></td>
+          </tr>
+          <tr>
+            <td><strong>Frontend</strong></td>
+            <td>Pages (11 routes)</td>
+            <td><code>frontend/src/pages/</code></td>
+            <td><span class="status-badge status-active">● Active Shell</span></td>
+          </tr>
+          <tr>
+            <td><strong>API</strong></td>
+            <td>FastAPI Routes</td>
+            <td><code>backend/app/api/v1/</code></td>
+            <td><span class="status-badge status-active">● Health Active</span></td>
+          </tr>
+          <tr>
+            <td><strong>Schemas</strong></td>
+            <td>Pydantic v2 Contracts</td>
+            <td><code>backend/app/schemas/</code></td>
+            <td><span class="status-badge status-active">● Defined</span></td>
+          </tr>
+          <tr>
+            <td><strong>Models</strong></td>
+            <td>SQLAlchemy 2 Models</td>
+            <td><code>backend/app/models/</code></td>
+            <td><span class="status-badge status-active">● Defined</span></td>
+          </tr>
+          <tr>
+            <td><strong>Services</strong></td>
+            <td>Business Logic</td>
+            <td><code>backend/app/services/</code></td>
+            <td><span class="status-badge status-active">● Health Active</span></td>
+          </tr>
+          <tr>
+            <td><strong>Repositories</strong></td>
+            <td>Data Access Layer</td>
+            <td><code>backend/app/repositories/</code></td>
+            <td><span class="status-badge status-active">● Base Shell</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI — Agents</strong></td>
+            <td>LangGraph Workflows</td>
+            <td><code>backend/app/ai/agents/</code></td>
+            <td><span class="status-badge status-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI — LLM</strong></td>
+            <td>LangChain Abstraction</td>
+            <td><code>backend/app/ai/llm/</code></td>
+            <td><span class="status-badge status-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI — RAG</strong></td>
+            <td>Retrieval Engine</td>
+            <td><code>backend/app/ai/rag/</code></td>
+            <td><span class="status-badge status-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI — Embeddings</strong></td>
+            <td>sentence-transformers</td>
+            <td><code>backend/app/ai/embeddings/</code></td>
+            <td><span class="status-badge status-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI — Tools</strong></td>
+            <td>Agent Tool Definitions</td>
+            <td><code>backend/app/ai/tools/</code></td>
+            <td><span class="status-badge status-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>ML Module</strong></td>
+            <td>Tabular Features & XGBoost</td>
+            <td><code>backend/app/ml/</code></td>
+            <td><span class="status-badge status-planned">○ Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Integrations</strong></td>
+            <td>YouTube Data Collector</td>
+            <td><code>backend/app/integrations/youtube/</code></td>
+            <td><span class="status-badge status-active">● Active Collector</span></td>
+          </tr>
+          <tr>
+            <td><strong>Integrations</strong></td>
+            <td>Instagram Business & Creator</td>
+            <td><code>backend/app/integrations/instagram/</code></td>
+            <td><span class="status-badge status-active">● Active Collector</span></td>
+          </tr>
+          <tr>
+            <td><strong>Integrations</strong></td>
+            <td>Bluesky Data Collector</td>
+            <td><code>backend/app/integrations/bsky/</code></td>
+            <td><span class="status-badge status-active">● Active Collector</span></td>
+          </tr>
+          <tr>
+            <td><strong>Database</strong></td>
+            <td>PostgreSQL 16 + pgvector</td>
+            <td><code>docker-compose.yml</code></td>
+            <td><span class="status-badge status-active">● Active</span></td>
+          </tr>
+          <tr>
+            <td><strong>CI/CD</strong></td>
+            <td>GitHub Actions CI</td>
+            <td><code>.github/workflows/</code></td>
+            <td><span class="status-badge status-active">● Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#111827',
+        primaryColor: '#1e3a5f',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#60a5fa',
+        secondaryColor: '#2d1b45',
+        tertiaryColor: '#1e3329'
+      },
+      securityLevel: 'loose'
+    });
+  </script>
+</body>
+</html>

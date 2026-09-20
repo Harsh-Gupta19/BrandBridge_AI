@@ -12,6 +12,7 @@ Start here if you are new:
 
 Important docs:
 
+- `architecture/technical-implementation-guide.md` provides an end-to-end technical guide, tech stack breakdown, and phased execution plan.
 - `architecture/` explains system design and future workflows.
 - `api/` explains backend API conventions.
 - `ml/` explains the recommendation model roadmap.
