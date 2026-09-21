@@ -2,9 +2,8 @@ from pathlib import Path
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-
 SCOPES = [
-     "https://www.googleapis.com/auth/youtube.readonly",
+    "https://www.googleapis.com/auth/youtube.readonly",
     "https://www.googleapis.com/auth/yt-analytics.readonly",
     "https://www.googleapis.com/auth/yt-analytics-monetary.readonly",
 ]
@@ -12,17 +11,9 @@ SCOPES = [
 
 BASE_DIR = Path(__file__).resolve().parent
 
-CLIENT_SECRET_FILE = (
-    BASE_DIR
-    / "oauth"
-    / "client_secret.json"
-)
+CLIENT_SECRET_FILE = BASE_DIR / "oauth" / "client_secret.json"
 
-TOKEN_FILE = (
-    BASE_DIR
-    / "oauth"
-    / "token.json"
-)
+TOKEN_FILE = BASE_DIR / "oauth" / "token.json"
 
 
 def main():
@@ -32,9 +23,7 @@ def main():
         SCOPES,
     )
 
-    credentials = flow.run_local_server(
-        port=0
-    )
+    credentials = flow.run_local_server(port=0)
 
     # Save OAuth credentials
     TOKEN_FILE.write_text(
@@ -47,10 +36,7 @@ def main():
     print(f"Token file: {TOKEN_FILE}")
 
     if credentials.token:
-        print(
-            "Access token:",
-            credentials.token[:10] + "..."
-        )
+        print("Access token:", credentials.token[:10] + "...")
 
     if credentials.refresh_token:
         print("Refresh token: available")

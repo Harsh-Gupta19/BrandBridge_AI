@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 BrandBridge AI - YouTube Data API v3 ALL-FIELD EXPLORER
 
@@ -26,6 +24,8 @@ API key. Owner-only/restricted fields are attempted separately and recorded
 as null + an error when the current credentials cannot access them.
 """
 
+from __future__ import annotations
+
 import csv
 import json
 import os
@@ -35,7 +35,6 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-
 
 # ============================================================
 # PROJECT / CONFIG
@@ -59,6 +58,7 @@ DEFAULT_DELAY = 0.1
 # Same approach as your working collector.
 # ============================================================
 
+
 def load_dotenv_values() -> dict[str, str]:
     values: dict[str, str] = {}
 
@@ -76,9 +76,7 @@ def load_dotenv_values() -> dict[str, str]:
                 continue
 
             key, raw_value = stripped.split("=", 1)
-            values[key.strip()] = (
-                raw_value.strip().strip('"').strip("'")
-            )
+            values[key.strip()] = raw_value.strip().strip('"').strip("'")
 
     return values
 
@@ -134,25 +132,57 @@ def get_api_key() -> str:
 # ============================================================
 
 CHANNEL_PARTS = [
-    "snippet", "contentDetails", "statistics", "topicDetails", "status",
-    "brandingSettings", "auditDetails", "contentOwnerDetails", "localizations",
+    "snippet",
+    "contentDetails",
+    "statistics",
+    "topicDetails",
+    "status",
+    "brandingSettings",
+    "auditDetails",
+    "contentOwnerDetails",
+    "localizations",
 ]
 CHANNEL_PUBLIC_PARTS = [
-    "snippet", "contentDetails", "statistics", "topicDetails", "status",
-    "brandingSettings", "localizations",
+    "snippet",
+    "contentDetails",
+    "statistics",
+    "topicDetails",
+    "status",
+    "brandingSettings",
+    "localizations",
 ]
 CHANNEL_RESTRICTED_PARTS = ["auditDetails", "contentOwnerDetails"]
 
 VIDEO_PARTS = [
-    "brandPartner", "contentDetails", "fileDetails", "id",
-    "liveStreamingDetails", "localizations", "paidProductPlacementDetails",
-    "player", "processingDetails", "recordingDetails", "snippet", "statistics",
-    "status", "suggestions", "topicDetails",
+    "brandPartner",
+    "contentDetails",
+    "fileDetails",
+    "id",
+    "liveStreamingDetails",
+    "localizations",
+    "paidProductPlacementDetails",
+    "player",
+    "processingDetails",
+    "recordingDetails",
+    "snippet",
+    "statistics",
+    "status",
+    "suggestions",
+    "topicDetails",
 ]
 VIDEO_PUBLIC_PARTS = [
-    "brandPartner", "contentDetails", "id", "liveStreamingDetails",
-    "localizations", "paidProductPlacementDetails", "player", "recordingDetails",
-    "snippet", "statistics", "status", "topicDetails",
+    "brandPartner",
+    "contentDetails",
+    "id",
+    "liveStreamingDetails",
+    "localizations",
+    "paidProductPlacementDetails",
+    "player",
+    "recordingDetails",
+    "snippet",
+    "statistics",
+    "status",
+    "topicDetails",
 ]
 VIDEO_RESTRICTED_PARTS = ["fileDetails", "processingDetails", "suggestions"]
 
@@ -167,6 +197,7 @@ CHANNEL_SECTION_PARTS = ["snippet", "contentDetails"]
 # GENERIC HELPERS
 # ============================================================
 
+
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
@@ -174,20 +205,20 @@ def write_json(path: Path, data: Any) -> None:
 
 
 def chunked(values: list[str], size: int) -> list[list[str]]:
-    return [values[i:i + size] for i in range(0, len(values), size)]
+    return [values[i : i + size] for i in range(0, len(values), size)]
 
 
 def youtube_get(resource: str, params: dict[str, Any]) -> dict[str, Any]:
-    request_params = {
-        k: v for k, v in params.items() if v is not None and v != ""
-    }
+    request_params = {k: v for k, v in params.items() if v is not None and v != ""}
     request_params["key"] = get_api_key()
 
     url = f"{YOUTUBE_API_BASE_URL}/{resource}?{urlencode(request_params)}"
     request = Request(url, headers={"Accept": "application/json"})
 
     try:
-        with urlopen(request, timeout=get_int_env("YOUTUBE_TIMEOUT_SECONDS", DEFAULT_TIMEOUT)) as response:
+        with urlopen(
+            request, timeout=get_int_env("YOUTUBE_TIMEOUT_SECONDS", DEFAULT_TIMEOUT)
+        ) as response:
             payload = response.read().decode("utf-8")
     except HTTPError as error:
         body = error.read().decode("utf-8", errors="replace")
@@ -212,6 +243,7 @@ def safe_get(resource: str, params: dict[str, Any]) -> dict[str, Any]:
 # ============================================================
 # DISCOVERY SCHEMA
 # ============================================================
+
 
 def get_discovery() -> dict[str, Any]:
     if DISCOVERY_FILE.exists():
@@ -314,6 +346,7 @@ def normalize(
 # CHANNELS
 # ============================================================
 
+
 def get_channel(channel_id: str, discovery: dict[str, Any]) -> dict[str, Any]:
     public = safe_get(
         "channels",
@@ -344,7 +377,9 @@ def get_channel(channel_id: str, discovery: dict[str, Any]) -> dict[str, Any]:
         result["restricted_parts"][part] = {
             "available": restricted is not None,
             "value": restricted,
-            "error": None if restricted is not None else (response["error"] or "No resource returned."),
+            "error": None
+            if restricted is not None
+            else (response["error"] or "No resource returned."),
         }
         if restricted:
             result["resource"] = merge_schema(
@@ -359,6 +394,7 @@ def get_channel(channel_id: str, discovery: dict[str, Any]) -> dict[str, Any]:
 # ============================================================
 # PLAYLIST ITEMS / VIDEOS / PLAYLISTS
 # ============================================================
+
 
 def get_playlist_items(playlist_id: str, max_items: int) -> dict[str, Any]:
     items: list[dict[str, Any]] = []
@@ -438,17 +474,19 @@ def get_videos(video_ids: list[str], discovery: dict[str, Any]) -> list[dict[str
                 "videos",
                 {"part": part, "id": ",".join(batch)},
             )
-            restricted_items = (response["value"] or {}).get("items", []) if response["available"] else []
-            restricted_by_id = {
-                item.get("id"): item for item in restricted_items if item.get("id")
-            }
+            restricted_items = (
+                (response["value"] or {}).get("items", []) if response["available"] else []
+            )
+            restricted_by_id = {item.get("id"): item for item in restricted_items if item.get("id")}
 
             for video_id in batch:
                 restricted = restricted_by_id.get(video_id)
                 results[video_id]["restricted_parts"][part] = {
                     "available": restricted is not None,
                     "value": restricted,
-                    "error": None if restricted is not None else (response["error"] or "No resource returned."),
+                    "error": None
+                    if restricted is not None
+                    else (response["error"] or "No resource returned."),
                 }
 
     return list(results.values())
@@ -457,6 +495,7 @@ def get_videos(video_ids: list[str], discovery: dict[str, Any]) -> list[dict[str
 # ============================================================
 # OTHER CREATOR-RELATED RESOURCES
 # ============================================================
+
 
 def get_comment_threads(video_id: str, max_items: int, discovery: dict[str, Any]) -> dict[str, Any]:
     try:
@@ -471,7 +510,10 @@ def get_comment_threads(video_id: str, max_items: int, discovery: dict[str, Any]
         )
         return {
             "available": True,
-            "items": [normalize(discovery, "CommentThread", x) for x in response.get("items", [])[:max_items]],
+            "items": [
+                normalize(discovery, "CommentThread", x)
+                for x in response.get("items", [])[:max_items]
+            ],
             "error": None,
         }
     except Exception as error:
@@ -490,14 +532,18 @@ def get_activities(channel_id: str, max_items: int, discovery: dict[str, Any]) -
         )
         return {
             "available": True,
-            "items": [normalize(discovery, "Activity", x) for x in response.get("items", [])[:max_items]],
+            "items": [
+                normalize(discovery, "Activity", x) for x in response.get("items", [])[:max_items]
+            ],
             "error": None,
         }
     except Exception as error:
         return {"available": False, "items": [], "error": str(error)}
 
 
-def get_channel_sections(channel_id: str, max_items: int, discovery: dict[str, Any]) -> dict[str, Any]:
+def get_channel_sections(
+    channel_id: str, max_items: int, discovery: dict[str, Any]
+) -> dict[str, Any]:
     try:
         response = youtube_get(
             "channelSections",
@@ -509,7 +555,10 @@ def get_channel_sections(channel_id: str, max_items: int, discovery: dict[str, A
         )
         return {
             "available": True,
-            "items": [normalize(discovery, "ChannelSection", x) for x in response.get("items", [])[:max_items]],
+            "items": [
+                normalize(discovery, "ChannelSection", x)
+                for x in response.get("items", [])[:max_items]
+            ],
             "error": None,
         }
     except Exception as error:
@@ -521,8 +570,14 @@ def get_reference_resources() -> dict[str, Any]:
     region = get_env("YOUTUBE_REGION_CODE", "IN") or "IN"
 
     calls = {
-        "video_categories": ("videoCategories", {"part": "snippet", "regionCode": region, "maxResults": 50}),
-        "guide_categories": ("guideCategories", {"part": "snippet", "regionCode": region, "maxResults": 50}),
+        "video_categories": (
+            "videoCategories",
+            {"part": "snippet", "regionCode": region, "maxResults": 50},
+        ),
+        "guide_categories": (
+            "guideCategories",
+            {"part": "snippet", "regionCode": region, "maxResults": 50},
+        ),
         "i18n_languages": ("i18nLanguages", {"part": "snippet"}),
         "i18n_regions": ("i18nRegions", {"part": "snippet"}),
         "video_abuse_report_reasons": ("videoAbuseReportReasons", {"part": "snippet"}),
@@ -542,6 +597,7 @@ def get_reference_resources() -> dict[str, Any]:
 # ============================================================
 # CHANNEL ID SOURCE
 # ============================================================
+
 
 def read_csv_channel_ids() -> list[str]:
     if not CREATOR_CSV.exists():
@@ -567,17 +623,33 @@ def discover_channels() -> tuple[list[str], dict[str, Any]]:
 
     csv_ids = read_csv_channel_ids()
     if csv_ids:
-        return csv_ids[:max_creators], {"used": False, "queries": [], "pages": [], "source": str(CREATOR_CSV)}
+        return csv_ids[:max_creators], {
+            "used": False,
+            "queries": [],
+            "pages": [],
+            "source": str(CREATOR_CSV),
+        }
 
     queries_raw = get_env("YOUTUBE_SEARCH_QUERIES")
     if queries_raw:
         queries = [x.strip() for x in queries_raw.split(",") if x.strip()]
     else:
         queries = [
-            "fitness India", "nutrition India", "gym India", "beauty India",
-            "skincare India", "makeup India", "technology India", "smartphone India",
-            "gaming India", "food India", "cooking India", "travel India",
-            "fashion India", "finance India", "education India",
+            "fitness India",
+            "nutrition India",
+            "gym India",
+            "beauty India",
+            "skincare India",
+            "makeup India",
+            "technology India",
+            "smartphone India",
+            "gaming India",
+            "food India",
+            "cooking India",
+            "travel India",
+            "fashion India",
+            "finance India",
+            "education India",
         ]
 
     region = get_env("YOUTUBE_REGION_CODE", "IN") or "IN"
@@ -624,6 +696,7 @@ def discover_channels() -> tuple[list[str], dict[str, Any]]:
 # ONE CREATOR
 # ============================================================
 
+
 def collect_creator(channel_id: str, discovery: dict[str, Any]) -> dict[str, Any]:
     max_videos = get_int_env("YOUTUBE_MAX_VIDEOS", 20)
     max_playlists = get_int_env("YOUTUBE_MAX_PLAYLISTS", 20)
@@ -655,15 +728,14 @@ def collect_creator(channel_id: str, discovery: dict[str, Any]) -> dict[str, Any
 
     print("  Channel: OK")
 
-    playlist_items = get_playlist_items(uploads_id, max_videos) if uploads_id else {
-        "available": False, "items": [], "error": "Uploads playlist ID unavailable."
-    }
+    playlist_items = (
+        get_playlist_items(uploads_id, max_videos)
+        if uploads_id
+        else {"available": False, "items": [], "error": "Uploads playlist ID unavailable."}
+    )
     print(f"  Upload playlist items: {len(playlist_items['items'])}")
 
-    video_ids = [
-        item.get("contentDetails", {}).get("videoId")
-        for item in playlist_items["items"]
-    ]
+    video_ids = [item.get("contentDetails", {}).get("videoId") for item in playlist_items["items"]]
     video_ids = [x for x in video_ids if x]
 
     videos = get_videos(video_ids, discovery)
@@ -704,6 +776,7 @@ def collect_creator(channel_id: str, discovery: dict[str, Any]) -> dict[str, Any
 # MAIN
 # ============================================================
 
+
 def main() -> None:
     print("=" * 80)
     print("BRANDBRIDGE AI")
@@ -737,14 +810,26 @@ def main() -> None:
             "collector": "youtube_data_api_all_fields.py",
             "api_base_url": YOUTUBE_API_BASE_URL,
             "discovery_url": DISCOVERY_URL,
-            "notes": [
-                "API key is loaded directly from .env or process environment.",
-                "Documented fields missing from a response are represented as null/empty arrays using the Discovery schema.",
-                "Restricted owner-only fields are attempted independently and retain an error when inaccessible.",
-                "Audience demographics are not public YouTube Data API fields; use YouTube Analytics OAuth for those.",
-                "Channel country is channel metadata and does not represent audience geography.",
-                "This explorer focuses on creator-related read/list resources; it does not execute mutating endpoints.",
-            ],
+"notes": [
+    "API key is loaded directly from .env or process environment.",
+    (
+    "Documented fields missing from a response are represented"
+    "null/empty arrays using Discovery schema."
+    ),
+    (
+    "Restricted owner-only fields are attempted independently"
+    "retain an error when inaccessible."
+    ),
+    (
+     "Audience demographics are not public YouTube Data API fields; "
+     "use YouTube Analytics OAuth for those."
+    ),
+    "Channel country is channel metadata and does not represent audience geography.",
+    (
+     "This explorer focuses on creator-related read/list resources; "
+     "it does not execute mutating endpoints."
+    ),
+],
         },
         "collection_config": {
             "max_creators": get_int_env("YOUTUBE_MAX_CREATORS", 100),

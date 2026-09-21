@@ -2,13 +2,12 @@ import json
 import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import requests
 from dotenv import load_dotenv
-
 
 # ============================================================
 # BRAND BRIDGE AI
@@ -24,21 +23,13 @@ load_dotenv()
 
 BASE_URL = "https://graph.instagram.com"
 
-ACCESS_TOKEN = os.getenv(
-    "INSTAGRAM_CREATOR_ACCESS_TOKEN"
-)
+ACCESS_TOKEN = os.getenv("INSTAGRAM_CREATOR_ACCESS_TOKEN")
 
 OUTPUT_DIR = Path("output")
 
-OUTPUT_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-OUTPUT_FILE = (
-    OUTPUT_DIR /
-    "instagram_creator_data.json"
-)
+OUTPUT_FILE = OUTPUT_DIR / "instagram_creator_data.json"
 
 MAX_MEDIA = 100
 
@@ -48,19 +39,11 @@ MAX_MEDIA = 100
 # ============================================================
 
 if not ACCESS_TOKEN:
+    print("\nERROR: INSTAGRAM_CREATOR_ACCESS_TOKEN was not found.")
 
-    print(
-        "\nERROR: INSTAGRAM_CREATOR_ACCESS_TOKEN "
-        "was not found."
-    )
+    print("\nCreate a .env file containing:")
 
-    print(
-        "\nCreate a .env file containing:"
-    )
-
-    print(
-        "INSTAGRAM_CREATOR_ACCESS_TOKEN=your_token_here"
-    )
+    print("INSTAGRAM_CREATOR_ACCESS_TOKEN=your_token_here")
 
     sys.exit(1)
 
@@ -69,12 +52,11 @@ if not ACCESS_TOKEN:
 # API REQUEST HELPER
 # ============================================================
 
+
 def api_get(
     endpoint: str,
-    params: Optional[
-        Dict[str, Any]
-    ] = None,
-) -> Dict[str, Any]:
+    params: dict[str, Any] | None = None,
+) -> dict[str, Any]:
 
     if params is None:
         params = {}
@@ -84,35 +66,22 @@ def api_get(
     params["access_token"] = ACCESS_TOKEN
 
     if endpoint.startswith("http"):
-
         url = endpoint
 
     else:
-
-        url = (
-            f"{BASE_URL}/"
-            f"{endpoint.lstrip('/')}"
-        )
+        url = f"{BASE_URL}/{endpoint.lstrip('/')}"
 
     # --------------------------------------------------------
     # NEVER PRINT ACCESS TOKEN
     # --------------------------------------------------------
 
-    safe_params = {
-        key: value
-        for key, value in params.items()
-        if key != "access_token"
-    }
+    safe_params = {key: value for key, value in params.items() if key != "access_token"}
 
     print("\n" + "-" * 70)
     print(f"GET {url}")
-    print(
-        "Parameters:",
-        safe_params
-    )
+    print("Parameters:", safe_params)
 
     try:
-
         response = requests.get(
             url,
             params=params,
@@ -120,38 +89,22 @@ def api_get(
         )
 
     except requests.RequestException as exc:
+        raise RuntimeError(f"Network error: {exc}") from exc
 
-        raise RuntimeError(
-            f"Network error: {exc}"
-        ) from exc
-
-    print(
-        f"HTTP Status: "
-        f"{response.status_code}"
-    )
+    print(f"HTTP Status: {response.status_code}")
 
     try:
-
         data = response.json()
 
     except ValueError as exc:
-
-        print(
-            "\nRaw response:"
-        )
+        print("\nRaw response:")
 
         print(response.text)
 
-        raise RuntimeError(
-            "Instagram API returned "
-            "a non-JSON response."
-        ) from exc
+        raise RuntimeError("Instagram API returned a non-JSON response.") from exc
 
     if not response.ok:
-
-        print(
-            "\nInstagram API ERROR:"
-        )
+        print("\nInstagram API ERROR:")
 
         print(
             json.dumps(
@@ -161,10 +114,7 @@ def api_get(
             )
         )
 
-        raise RuntimeError(
-            f"Instagram API request failed "
-            f"with HTTP {response.status_code}"
-        )
+        raise RuntimeError(f"Instagram API request failed with HTTP {response.status_code}")
 
     return data
 
@@ -187,23 +137,16 @@ PROFILE_FIELDS = [
 ]
 
 
-def fetch_creator_profile() -> Dict[str, Any]:
+def fetch_creator_profile() -> dict[str, Any]:
 
     print("\n")
     print("=" * 70)
     print("1. FETCHING CREATOR PROFILE")
     print("=" * 70)
 
-    fields = ",".join(
-        PROFILE_FIELDS
-    )
+    fields = ",".join(PROFILE_FIELDS)
 
-    response = api_get(
-        "me",
-        {
-            "fields": fields
-        }
-    )
+    response = api_get("me", {"fields": fields})
 
     print("\nCreator profile:")
     print(
@@ -239,115 +182,71 @@ MEDIA_FIELDS = [
 
 def fetch_media_page(
     limit: int = 25,
-    after: Optional[str] = None,
-) -> Dict[str, Any]:
+    after: str | None = None,
+) -> dict[str, Any]:
 
-    params: Dict[str, Any] = {
-
-        "fields": ",".join(
-            MEDIA_FIELDS
-        ),
-
+    params: dict[str, Any] = {
+        "fields": ",".join(MEDIA_FIELDS),
         "limit": limit,
     }
 
     if after:
-
         params["after"] = after
 
-    return api_get(
-        "me/media",
-        params
-    )
+    return api_get("me/media", params)
 
 
 def fetch_all_media(
     max_items: int = 100,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
 
     print("\n")
     print("=" * 70)
     print("2. FETCHING CREATOR MEDIA")
     print("=" * 70)
 
-    all_media: List[
-        Dict[str, Any]
-    ] = []
+    all_media: list[dict[str, Any]] = []
 
-    after: Optional[str] = None
+    after: str | None = None
 
     while len(all_media) < max_items:
+        remaining = max_items - len(all_media)
 
-        remaining = (
-            max_items -
-            len(all_media)
-        )
-
-        limit = min(
-            25,
-            remaining
-        )
+        limit = min(25, remaining)
 
         response = fetch_media_page(
             limit=limit,
             after=after,
         )
 
-        page = response.get(
-            "data",
-            []
-        )
+        page = response.get("data", [])
 
         if not page:
-
-            print(
-                "\nNo more media returned."
-            )
+            print("\nNo more media returned.")
 
             break
 
-        all_media.extend(
-            page
-        )
+        all_media.extend(page)
 
-        print(
-            f"Retrieved "
-            f"{len(page)} media items"
-        )
+        print(f"Retrieved {len(page)} media items")
 
-        print(
-            f"Total collected: "
-            f"{len(all_media)}"
-        )
+        print(f"Total collected: {len(all_media)}")
 
-        paging = response.get(
-            "paging",
-            {}
-        )
+        paging = response.get("paging", {})
 
-        cursors = paging.get(
-            "cursors",
-            {}
-        )
+        cursors = paging.get("cursors", {})
 
-        after = cursors.get(
-            "after"
-        )
+        after = cursors.get("after")
 
         if not after:
-
-            print(
-                "\nPagination complete."
-            )
+            print("\nPagination complete.")
 
             break
 
         # Small pause between requests
         time.sleep(0.2)
 
-    return all_media[
-        :max_items
-    ]
+    return all_media[:max_items]
 
 
 # ============================================================
@@ -364,31 +263,15 @@ CAROUSEL_CHILD_FIELDS = [
 
 def fetch_carousel_children(
     media_id: str,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
 
     try:
+        response = api_get(f"{media_id}/children", {"fields": ",".join(CAROUSEL_CHILD_FIELDS)})
 
-        response = api_get(
-            f"{media_id}/children",
-            {
-                "fields": ",".join(
-                    CAROUSEL_CHILD_FIELDS
-                )
-            }
-        )
-
-        return response.get(
-            "data",
-            []
-        )
+        return response.get("data", [])
 
     except RuntimeError as exc:
-
-        print(
-            f"\nCould not retrieve "
-            f"carousel children for "
-            f"{media_id}"
-        )
+        print(f"\nCould not retrieve carousel children for {media_id}")
 
         print(exc)
 
@@ -396,12 +279,8 @@ def fetch_carousel_children(
 
 
 def enrich_carousels(
-    media: List[
-        Dict[str, Any]
-    ],
-) -> List[
-    Dict[str, Any]
-]:
+    media: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
 
     print("\n")
     print("=" * 70)
@@ -411,40 +290,23 @@ def enrich_carousels(
     carousel_count = 0
 
     for item in media:
-
-        if (
-            item.get("media_type")
-            != "CAROUSEL_ALBUM"
-        ):
+        if item.get("media_type") != "CAROUSEL_ALBUM":
             continue
 
-        media_id = item.get(
-            "id"
-        )
+        media_id = item.get("id")
 
         if not media_id:
-
             continue
 
         carousel_count += 1
 
-        print(
-            f"\nCarousel {carousel_count}: "
-            f"{media_id}"
-        )
+        print(f"\nCarousel {carousel_count}: {media_id}")
 
-        children = (
-            fetch_carousel_children(
-                media_id
-            )
-        )
+        children = fetch_carousel_children(media_id)
 
         item["children"] = children
 
-    print(
-        f"\nTotal carousels processed: "
-        f"{carousel_count}"
-    )
+    print(f"\nTotal carousels processed: {carousel_count}")
 
     return media
 
@@ -453,27 +315,20 @@ def enrich_carousels(
 # 4. CALCULATE SUMMARY
 # ============================================================
 
+
 def calculate_summary(
-    profile: Dict[str, Any],
-    media: List[
-        Dict[str, Any]
-    ],
-) -> Dict[str, Any]:
+    profile: dict[str, Any],
+    media: list[dict[str, Any]],
+) -> dict[str, Any]:
 
     print("\n")
     print("=" * 70)
     print("4. CALCULATING SUMMARY")
     print("=" * 70)
 
-    media_types: Dict[
-        str,
-        int
-    ] = {}
+    media_types: dict[str, int] = {}
 
-    product_types: Dict[
-        str,
-        int
-    ] = {}
+    product_types: dict[str, int] = {}
 
     total_likes = 0
 
@@ -488,56 +343,29 @@ def calculate_summary(
     media_with_views = 0
 
     for item in media:
-
         # ----------------------------------------------------
         # Media type
         # ----------------------------------------------------
 
-        media_type = item.get(
-            "media_type",
-            "UNKNOWN"
-        )
+        media_type = item.get("media_type", "UNKNOWN")
 
-        media_types[
-            media_type
-        ] = (
-            media_types.get(
-                media_type,
-                0
-            ) + 1
-        )
+        media_types[media_type] = media_types.get(media_type, 0) + 1
 
         # ----------------------------------------------------
         # Product type
         # ----------------------------------------------------
 
-        product_type = item.get(
-            "media_product_type",
-            "UNKNOWN"
-        )
+        product_type = item.get("media_product_type", "UNKNOWN")
 
-        product_types[
-            product_type
-        ] = (
-            product_types.get(
-                product_type,
-                0
-            ) + 1
-        )
+        product_types[product_type] = product_types.get(product_type, 0) + 1
 
         # ----------------------------------------------------
         # Likes
         # ----------------------------------------------------
 
-        likes = item.get(
-            "like_count"
-        )
+        likes = item.get("like_count")
 
-        if isinstance(
-            likes,
-            (int, float)
-        ):
-
+        if isinstance(likes, (int, float)):
             total_likes += likes
 
             media_with_likes += 1
@@ -546,15 +374,9 @@ def calculate_summary(
         # Comments
         # ----------------------------------------------------
 
-        comments = item.get(
-            "comments_count"
-        )
+        comments = item.get("comments_count")
 
-        if isinstance(
-            comments,
-            (int, float)
-        ):
-
+        if isinstance(comments, (int, float)):
             total_comments += comments
 
             media_with_comments += 1
@@ -563,15 +385,9 @@ def calculate_summary(
         # Views
         # ----------------------------------------------------
 
-        views = item.get(
-            "view_count"
-        )
+        views = item.get("view_count")
 
-        if isinstance(
-            views,
-            (int, float)
-        ):
-
+        if isinstance(views, (int, float)):
             total_views += views
 
             media_with_views += 1
@@ -580,108 +396,36 @@ def calculate_summary(
     # Averages
     # --------------------------------------------------------
 
-    average_likes = (
-        total_likes /
-        media_with_likes
-        if media_with_likes
-        else 0
-    )
+    average_likes = total_likes / media_with_likes if media_with_likes else 0
 
-    average_comments = (
-        total_comments /
-        media_with_comments
-        if media_with_comments
-        else 0
-    )
+    average_comments = total_comments / media_with_comments if media_with_comments else 0
 
-    average_views = (
-        total_views /
-        media_with_views
-        if media_with_views
-        else 0
-    )
+    average_views = total_views / media_with_views if media_with_views else 0
 
     summary = {
-
         "profile": {
-
-            "instagram_user_id":
-                profile.get("id"),
-
-            "username":
-                profile.get("username"),
-
-            "name":
-                profile.get("name"),
-
-            "account_type":
-                profile.get(
-                    "account_type"
-                ),
-
-            "followers_count":
-                profile.get(
-                    "followers_count"
-                ),
-
-            "follows_count":
-                profile.get(
-                    "follows_count"
-                ),
-
-            "media_count":
-                profile.get(
-                    "media_count"
-                ),
+            "instagram_user_id": profile.get("id"),
+            "username": profile.get("username"),
+            "name": profile.get("name"),
+            "account_type": profile.get("account_type"),
+            "followers_count": profile.get("followers_count"),
+            "follows_count": profile.get("follows_count"),
+            "media_count": profile.get("media_count"),
         },
-
         "collection": {
-
-            "media_collected":
-                len(media),
-
-            "media_types":
-                media_types,
-
-            "media_product_types":
-                product_types,
-
-            "total_likes":
-                total_likes,
-
-            "total_comments":
-                total_comments,
-
-            "total_views":
-                total_views,
-
-            "average_likes":
-                round(
-                    average_likes,
-                    2
-                ),
-
-            "average_comments":
-                round(
-                    average_comments,
-                    2
-                ),
-
-            "average_views":
-                round(
-                    average_views,
-                    2
-                ),
-
-            "media_with_likes":
-                media_with_likes,
-
-            "media_with_comments":
-                media_with_comments,
-
-            "media_with_views":
-                media_with_views,
-        }
+            "media_collected": len(media),
+            "media_types": media_types,
+            "media_product_types": product_types,
+            "total_likes": total_likes,
+            "total_comments": total_comments,
+            "total_views": total_views,
+            "average_likes": round(average_likes, 2),
+            "average_comments": round(average_comments, 2),
+            "average_views": round(average_views, 2),
+            "media_with_likes": media_with_likes,
+            "media_with_comments": media_with_comments,
+            "media_with_views": media_with_views,
+        },
     }
 
     return summary
@@ -691,44 +435,23 @@ def calculate_summary(
 # 5. BUILD FINAL DATASET
 # ============================================================
 
+
 def build_dataset(
-    profile: Dict[str, Any],
-    media: List[
-        Dict[str, Any]
-    ],
-    summary: Dict[str, Any],
-) -> Dict[str, Any]:
+    profile: dict[str, Any],
+    media: list[dict[str, Any]],
+    summary: dict[str, Any],
+) -> dict[str, Any]:
 
     return {
-
-        "project":
-            "BrandBridge AI",
-
-        "collector":
-            "Instagram Creator Data Collector",
-
-        "source":
-            "Instagram Graph API",
-
-        "authentication":
-            "Instagram Login",
-
-        "account_type":
-            "Professional Creator",
-
-        "collected_at":
-            datetime.now(
-                timezone.utc
-            ).isoformat(),
-
-        "profile":
-            profile,
-
-        "media":
-            media,
-
-        "summary":
-            summary,
+        "project": "BrandBridge AI",
+        "collector": "Instagram Creator Data Collector",
+        "source": "Instagram Graph API",
+        "authentication": "Instagram Login",
+        "account_type": "Professional Creator",
+        "collected_at": datetime.now(UTC).isoformat(),
+        "profile": profile,
+        "media": media,
+        "summary": summary,
     }
 
 
@@ -736,15 +459,15 @@ def build_dataset(
 # 6. SAVE JSON
 # ============================================================
 
+
 def save_dataset(
-    dataset: Dict[str, Any],
+    dataset: dict[str, Any],
 ) -> None:
 
     with OUTPUT_FILE.open(
         "w",
         encoding="utf-8",
     ) as file:
-
         json.dump(
             dataset,
             file,
@@ -757,15 +480,13 @@ def save_dataset(
     print("5. DATA SAVED")
     print("=" * 70)
 
-    print(
-        f"\nFile:"
-        f"\n{OUTPUT_FILE.resolve()}"
-    )
+    print(f"\nFile:\n{OUTPUT_FILE.resolve()}")
 
 
 # ============================================================
 # 7. MAIN
 # ============================================================
+
 
 def main():
 
@@ -779,46 +500,29 @@ def main():
     # STEP 1
     # --------------------------------------------------------
 
-    profile = (
-        fetch_creator_profile()
-    )
+    profile = fetch_creator_profile()
 
     # --------------------------------------------------------
     # Verify account type
     # --------------------------------------------------------
 
-    account_type = profile.get(
-        "account_type"
-    )
+    account_type = profile.get("account_type")
 
-    username = profile.get(
-        "username"
-    )
+    username = profile.get("username")
 
     print("\n")
     print("=" * 70)
     print("ACCOUNT VERIFICATION")
     print("=" * 70)
 
-    print(
-        f"\nUsername: {username}"
-    )
+    print(f"\nUsername: {username}")
 
-    print(
-        f"Account type returned by API: "
-        f"{account_type}"
-    )
+    print(f"Account type returned by API: {account_type}")
 
     if account_type != "CREATOR":
+        print("\nWARNING:")
 
-        print(
-            "\nWARNING:"
-        )
-
-        print(
-            "The API did not return "
-            "'CREATOR' as the account type."
-        )
+        print("The API did not return 'CREATOR' as the account type.")
 
         print(
             "The collector will stop so that "
@@ -828,52 +532,37 @@ def main():
 
         return
 
-    print(
-        "\nConfirmed: Professional Creator account."
-    )
+    print("\nConfirmed: Professional Creator account.")
 
     # --------------------------------------------------------
     # STEP 2
     # --------------------------------------------------------
 
-    media = fetch_all_media(
-        max_items=MAX_MEDIA
-    )
+    media = fetch_all_media(max_items=MAX_MEDIA)
 
     # --------------------------------------------------------
     # STEP 3
     # --------------------------------------------------------
 
-    media = enrich_carousels(
-        media
-    )
+    media = enrich_carousels(media)
 
     # --------------------------------------------------------
     # STEP 4
     # --------------------------------------------------------
 
-    summary = calculate_summary(
-        profile,
-        media
-    )
+    summary = calculate_summary(profile, media)
 
     # --------------------------------------------------------
     # STEP 5
     # --------------------------------------------------------
 
-    dataset = build_dataset(
-        profile,
-        media,
-        summary
-    )
+    dataset = build_dataset(profile, media, summary)
 
     # --------------------------------------------------------
     # STEP 6
     # --------------------------------------------------------
 
-    save_dataset(
-        dataset
-    )
+    save_dataset(dataset)
 
     # --------------------------------------------------------
     # DISPLAY FINAL JSON
@@ -899,5 +588,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

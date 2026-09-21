@@ -6,28 +6,17 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
 
-TOKEN_FILE = (
-    BASE_DIR
-    / "oauth"
-    / "token.json"
-)
+TOKEN_FILE = BASE_DIR / "oauth" / "token.json"
 
-OUTPUT_DIR = (
-    BASE_DIR
-    / "../../../../data/raw/youtube/analytics"
-).resolve()
+OUTPUT_DIR = (BASE_DIR / "../../../../data/raw/youtube/analytics").resolve()
 
-OUTPUT_FILE = (
-    OUTPUT_DIR
-    / "youtube_analytics_data.json"
-)
+OUTPUT_FILE = OUTPUT_DIR / "youtube_analytics_data.json"
 
 API_SERVICE_NAME = "youtubeAnalytics"
 API_VERSION = "v2"
@@ -48,19 +37,13 @@ START_DATE = END_DATE - timedelta(days=30)
 # AUTHENTICATION
 # ============================================================
 
+
 def get_credentials():
 
     if not TOKEN_FILE.exists():
+        raise FileNotFoundError(f"Token file not found: {TOKEN_FILE}")
 
-        raise FileNotFoundError(
-            f"Token file not found: {TOKEN_FILE}"
-        )
-
-    credentials = (
-        Credentials.from_authorized_user_file(
-            str(TOKEN_FILE)
-        )
-    )
+    credentials = Credentials.from_authorized_user_file(str(TOKEN_FILE))
 
     return credentials
 
@@ -68,6 +51,7 @@ def get_credentials():
 # ============================================================
 # YOUTUBE ANALYTICS SERVICE
 # ============================================================
+
 
 def get_analytics_service():
 
@@ -85,6 +69,7 @@ def get_analytics_service():
 # ============================================================
 # BASIC CHANNEL ANALYTICS
 # ============================================================
+
 
 def get_channel_overview(service):
 
@@ -119,6 +104,7 @@ def get_channel_overview(service):
 # SAVE
 # ============================================================
 
+
 def save_json(data):
 
     OUTPUT_DIR.mkdir(
@@ -130,7 +116,6 @@ def save_json(data):
         "w",
         encoding="utf-8",
     ) as file:
-
         json.dump(
             data,
             file,
@@ -138,15 +123,13 @@ def save_json(data):
             ensure_ascii=False,
         )
 
-    print(
-        f"\nSaved to:"
-        f"\n{OUTPUT_FILE}"
-    )
+    print(f"\nSaved to:\n{OUTPUT_FILE}")
 
 
 # ============================================================
 # MAIN
 # ============================================================
+
 
 def main():
 
@@ -156,28 +139,19 @@ def main():
     print("YOUTUBE ANALYTICS API")
     print("=" * 70)
 
-    print(
-        f"\nDate range:"
-        f"\n{START_DATE}"
-        f" → {END_DATE}"
-    )
+    print(f"\nDate range:\n{START_DATE} → {END_DATE}")
 
     try:
-
         service = get_analytics_service()
 
-        response = get_channel_overview(
-            service
-        )
+        response = get_channel_overview(service)
 
         output = {
             "source": "YouTube Analytics API",
             "api_version": API_VERSION,
             "channel": "channel==MINE",
-            "start_date":
-                START_DATE.isoformat(),
-            "end_date":
-                END_DATE.isoformat(),
+            "start_date": START_DATE.isoformat(),
+            "end_date": END_DATE.isoformat(),
             "report": response,
         }
 
@@ -196,14 +170,12 @@ def main():
         )
 
     except HttpError as exc:
-
         print("\nYouTube Analytics API ERROR:")
         print(exc)
 
         raise
 
     except Exception as exc:
-
         print("\nERROR:")
         print(exc)
 

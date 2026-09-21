@@ -53,12 +53,11 @@ from __future__ import annotations
 import json
 import os
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import requests
-
 
 # ---------------------------------------------------------------------------
 # Paths / environment
@@ -94,11 +93,7 @@ def load_dotenv_values() -> dict[str, str]:
                 key = key.strip()
                 value = value.strip()
 
-                if (
-                    len(value) >= 2
-                    and value[0] == value[-1]
-                    and value[0] in {'"', "'"}
-                ):
+                if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
                     value = value[1:-1]
 
                 values[key] = value
@@ -116,9 +111,7 @@ def get_env(name: str, default: str | None = None) -> str | None:
 
 
 API_VERSION = get_env("INSTAGRAM_API_VERSION", "v22.0")
-BASE_URL = (get_env("INSTAGRAM_API_BASE", "https://graph.instagram.com") or "").rstrip(
-    "/"
-)
+BASE_URL = (get_env("INSTAGRAM_API_BASE", "https://graph.instagram.com") or "").rstrip("/")
 ACCESS_TOKEN = get_env("INSTAGRAM_ACCESS_TOKEN")
 USER_ID = get_env("INSTAGRAM_USER_ID")
 
@@ -242,7 +235,7 @@ session.headers.update(
 
 
 def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def endpoint(path: str) -> str:
@@ -416,6 +409,7 @@ def collect_paginated(
 # Profile
 # ---------------------------------------------------------------------------
 
+
 def collect_profile(user_id: str) -> dict[str, Any]:
     values, status = probe_fields(
         user_id,
@@ -432,6 +426,7 @@ def collect_profile(user_id: str) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Media
 # ---------------------------------------------------------------------------
+
 
 def collect_media(user_id: str) -> dict[str, Any]:
     """
@@ -511,6 +506,7 @@ def collect_media(user_id: str) -> dict[str, Any]:
 # Comments
 # ---------------------------------------------------------------------------
 
+
 def collect_comments(media_records: list[dict[str, Any]]) -> dict[str, Any]:
     if not INCLUDE_COMMENTS:
         return {
@@ -571,6 +567,7 @@ def collect_comments(media_records: list[dict[str, Any]]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Insights
 # ---------------------------------------------------------------------------
+
 
 def probe_insight_metric(
     object_id: str,
@@ -700,6 +697,7 @@ def collect_media_insights(media_records: list[dict[str, Any]]) -> dict[str, Any
 # Facebook Login Page discovery
 # ---------------------------------------------------------------------------
 
+
 def collect_page_context() -> dict[str, Any]:
     """
     Optional helper for Facebook Login.
@@ -741,6 +739,7 @@ def collect_page_context() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Derived summary
 # ---------------------------------------------------------------------------
+
 
 def safe_number(value: Any) -> float | None:
     if isinstance(value, bool):
@@ -811,11 +810,11 @@ def calculate_summary(media: list[dict[str, Any]]) -> dict[str, Any]:
 # Main collector
 # ---------------------------------------------------------------------------
 
+
 def run() -> dict[str, Any]:
     if not ACCESS_TOKEN:
         raise RuntimeError(
-            "INSTAGRAM_ACCESS_TOKEN is not configured. "
-            "Add it to .env or the environment."
+            "INSTAGRAM_ACCESS_TOKEN is not configured. Add it to .env or the environment."
         )
 
     if not USER_ID:
@@ -897,30 +896,14 @@ def run() -> dict[str, Any]:
         "facebook_login_page_context": page_context,
         "derived_summary": summary,
         "schemas": {
-            "profile_fields": {
-                field: None for field in PROFILE_FIELDS
-            },
-            "media_fields": {
-                field: None for field in MEDIA_FIELDS
-            },
-            "carousel_child_fields": {
-                field: None for field in CAROUSEL_CHILD_FIELDS
-            },
-            "comment_fields": {
-                field: None for field in COMMENT_FIELDS
-            },
-            "user_insight_metrics": {
-                metric: None for metric in USER_INSIGHT_METRICS
-            },
-            "media_insight_metrics": {
-                metric: None for metric in MEDIA_INSIGHT_METRICS
-            },
-            "audience_insight_metrics": {
-                metric: None for metric in AUDIENCE_INSIGHT_METRICS
-            },
-            "page_fields": {
-                field: None for field in PAGE_FIELDS
-            },
+            "profile_fields": {field: None for field in PROFILE_FIELDS},
+            "media_fields": {field: None for field in MEDIA_FIELDS},
+            "carousel_child_fields": {field: None for field in CAROUSEL_CHILD_FIELDS},
+            "comment_fields": {field: None for field in COMMENT_FIELDS},
+            "user_insight_metrics": {metric: None for metric in USER_INSIGHT_METRICS},
+            "media_insight_metrics": {metric: None for metric in MEDIA_INSIGHT_METRICS},
+            "audience_insight_metrics": {metric: None for metric in AUDIENCE_INSIGHT_METRICS},
+            "page_fields": {field: None for field in PAGE_FIELDS},
         },
     }
 

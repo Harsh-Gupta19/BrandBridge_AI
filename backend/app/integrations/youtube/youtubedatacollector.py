@@ -1,40 +1,30 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
-from dataclasses import dataclass
-from datetime import UTC, datetime
 import json
 import os
-from pathlib import Path
 import re
 import statistics
 import sys
 import time
+from collections import Counter
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
-YOUTUBE_API_BASE_URL = (
-    "https://www.googleapis.com/youtube/v3"
-)
+YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3"
 
-PROJECT_ROOT = (
-    Path(__file__).resolve().parents[4]
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
-DEFAULT_OUTPUT_DIR = (
-    PROJECT_ROOT
-    / "data"
-    / "raw"
-    / "youtube"
-)
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "raw" / "youtube"
 
 
 # ============================================================
@@ -96,6 +86,7 @@ DEFAULT_SEARCH_QUERIES = (
 # CUSTOM ERROR
 # ============================================================
 
+
 class YouTubeCollectionError(RuntimeError):
     """Raised when YouTube data collection cannot continue."""
 
@@ -104,16 +95,14 @@ class YouTubeCollectionError(RuntimeError):
 # CONFIG DATACLASS
 # ============================================================
 
+
 @dataclass(frozen=True)
 class YouTubeCollectorConfig:
-
     api_key: str
 
     output_dir: Path = DEFAULT_OUTPUT_DIR
 
-    search_queries: tuple[
-        str, ...
-    ] = DEFAULT_SEARCH_QUERIES
+    search_queries: tuple[str, ...] = DEFAULT_SEARCH_QUERIES
 
     max_creators: int = 100
 
@@ -136,6 +125,7 @@ class YouTubeCollectorConfig:
 # ENVIRONMENT HELPERS
 # ============================================================
 
+
 def load_dotenv_values() -> dict[str, str]:
 
     values: dict[str, str] = {}
@@ -144,33 +134,18 @@ def load_dotenv_values() -> dict[str, str]:
         PROJECT_ROOT / ".env",
         PROJECT_ROOT / "backend" / ".env",
     ):
-
         if not env_path.exists():
             continue
 
-        for line in env_path.read_text(
-            encoding="utf-8"
-        ).splitlines():
-
+        for line in env_path.read_text(encoding="utf-8").splitlines():
             stripped = line.strip()
 
-            if (
-                not stripped
-                or stripped.startswith("#")
-                or "=" not in stripped
-            ):
+            if not stripped or stripped.startswith("#") or "=" not in stripped:
                 continue
 
-            key, raw_value = (
-                stripped.split("=", 1)
-            )
+            key, raw_value = stripped.split("=", 1)
 
-            values[key.strip()] = (
-                raw_value
-                .strip()
-                .strip('"')
-                .strip("'")
-            )
+            values[key.strip()] = raw_value.strip().strip('"').strip("'")
 
     return values
 
@@ -183,11 +158,7 @@ def get_env(
     default: str | None = None,
 ) -> str | None:
 
-    return (
-        os.environ.get(name)
-        or DOTENV_VALUES.get(name)
-        or default
-    )
+    return os.environ.get(name) or DOTENV_VALUES.get(name) or default
 
 
 def get_int_env(
@@ -234,7 +205,6 @@ def get_list_env(
         return default
 
     if value.startswith("["):
-
         try:
             parsed = json.loads(value)
 
@@ -247,22 +217,15 @@ def get_list_env(
         ):
             return default
 
-        return tuple(
-            str(item).strip()
-            for item in parsed
-            if str(item).strip()
-        )
+        return tuple(str(item).strip() for item in parsed if str(item).strip())
 
-    return tuple(
-        item.strip()
-        for item in value.split(",")
-        if item.strip()
-    )
+    return tuple(item.strip() for item in value.split(",") if item.strip())
 
 
 # ============================================================
 # SAFE CONVERSION HELPERS
 # ============================================================
+
 
 def safe_int(
     value: Any,
@@ -326,7 +289,7 @@ def chunked(
 ) -> list[list[str]]:
 
     return [
-        values[index:index + size]
+        values[index : index + size]
         for index in range(
             0,
             len(values),
@@ -338,6 +301,7 @@ def chunked(
 # ============================================================
 # JSON OUTPUT
 # ============================================================
+
 
 def write_json(
     path: Path,
@@ -353,7 +317,6 @@ def write_json(
         "w",
         encoding="utf-8",
     ) as output_file:
-
         json.dump(
             data,
             output_file,
@@ -365,6 +328,7 @@ def write_json(
 # ============================================================
 # DATE HELPERS
 # ============================================================
+
 
 def parse_datetime(
     value: str | None,
@@ -389,9 +353,7 @@ def calculate_days_since(
     published_at: str | None,
 ) -> int:
 
-    published = parse_datetime(
-        published_at
-    )
+    published = parse_datetime(published_at)
 
     if not published:
         return 0
@@ -400,15 +362,14 @@ def calculate_days_since(
 
     return max(
         0,
-        (
-            now - published
-        ).days,
+        (now - published).days,
     )
 
 
 # ============================================================
 # YOUTUBE DURATION
 # ============================================================
+
 
 def parse_youtube_duration_seconds(
     duration: str | None,
@@ -429,23 +390,17 @@ def parse_youtube_duration_seconds(
     if not match:
         return None
 
-    parts = {
-        key: int(value or 0)
-        for key, value
-        in match.groupdict().items()
-    }
+    parts = {key: int(value or 0) for key, value in match.groupdict().items()}
 
     return (
-        parts["days"] * 86_400
-        + parts["hours"] * 3_600
-        + parts["minutes"] * 60
-        + parts["seconds"]
+        parts["days"] * 86_400 + parts["hours"] * 3_600 + parts["minutes"] * 60 + parts["seconds"]
     )
 
 
 # ============================================================
 # CONTENT FORMAT
 # ============================================================
+
 
 def get_content_format(
     duration_seconds: int | None,
@@ -470,17 +425,10 @@ def infer_content_formats(
     formats: set[str] = set()
 
     for video in videos:
-
-        content_format = get_content_format(
-            video.get(
-                "duration_seconds"
-            )
-        )
+        content_format = get_content_format(video.get("duration_seconds"))
 
         if content_format:
-            formats.add(
-                content_format
-            )
+            formats.add(content_format)
 
     return sorted(formats)
 
@@ -488,6 +436,7 @@ def infer_content_formats(
 # ============================================================
 # YOUTUBE API REQUEST
 # ============================================================
+
 
 def youtube_get(
     resource: str,
@@ -499,71 +448,39 @@ def youtube_get(
 ) -> dict[str, Any]:
 
     request_params = {
-        key: value
-        for key, value in params.items()
-        if (
-            value is not None
-            and value != ""
-        )
+        key: value for key, value in params.items() if (value is not None and value != "")
     }
 
-    request_params["key"] = (
-        config.api_key
-    )
+    request_params["key"] = config.api_key
 
-    url = (
-        f"{YOUTUBE_API_BASE_URL}/"
-        f"{resource}?"
-        f"{urlencode(request_params)}"
-    )
+    url = f"{YOUTUBE_API_BASE_URL}/{resource}?{urlencode(request_params)}"
 
     request = Request(
         url,
-        headers={
-            "Accept": "application/json"
-        },
+        headers={"Accept": "application/json"},
     )
 
     try:
-
         with urlopen(
             request,
             timeout=config.timeout_seconds,
         ) as response:
-
-            payload = (
-                response
-                .read()
-                .decode("utf-8")
-            )
+            payload = response.read().decode("utf-8")
 
     except HTTPError as error:
-
-        error_body = (
-            error
-            .read()
-            .decode(
-                "utf-8",
-                errors="replace",
-            )
+        error_body = error.read().decode(
+            "utf-8",
+            errors="replace",
         )
 
         raise YouTubeCollectionError(
-            "YouTube API request failed "
-            f"with HTTP {error.code}: "
-            f"{error_body}"
+            f"YouTube API request failed with HTTP {error.code}: {error_body}"
         ) from error
 
     except URLError as error:
+        raise YouTubeCollectionError(f"YouTube API request failed: {error}") from error
 
-        raise YouTubeCollectionError(
-            "YouTube API request failed: "
-            f"{error}"
-        ) from error
-
-    time.sleep(
-        config.request_delay_seconds
-    )
+    time.sleep(config.request_delay_seconds)
 
     return json.loads(payload)
 
@@ -571,6 +488,7 @@ def youtube_get(
 # ============================================================
 # SEARCH CHANNELS
 # ============================================================
+
 
 def search_channels(
     config: YouTubeCollectorConfig,
@@ -584,18 +502,12 @@ def search_channels(
         dict[str, Any],
     ] = {}
 
-    raw_search_pages: list[
-        dict[str, Any]
-    ] = []
+    raw_search_pages: list[dict[str, Any]] = []
 
     for query in config.search_queries:
-
         next_page_token: str | None = None
 
-        for page_number in range(
-            config.search_pages_per_query
-        ):
-
+        for page_number in range(config.search_pages_per_query):
             response = youtube_get(
                 "search",
                 {
@@ -603,15 +515,9 @@ def search_channels(
                     "q": query,
                     "type": "channel",
                     "maxResults": 50,
-                    "regionCode": (
-                        config.region_code
-                    ),
-                    "relevanceLanguage": (
-                        config.language_code
-                    ),
-                    "pageToken": (
-                        next_page_token
-                    ),
+                    "regionCode": (config.region_code),
+                    "relevanceLanguage": (config.language_code),
+                    "pageToken": (next_page_token),
                 },
                 config,
             )
@@ -619,9 +525,7 @@ def search_channels(
             raw_search_pages.append(
                 {
                     "query": query,
-                    "page_number": (
-                        page_number + 1
-                    ),
+                    "page_number": (page_number + 1),
                     "response": response,
                 }
             )
@@ -630,12 +534,7 @@ def search_channels(
                 "items",
                 [],
             ):
-
-                channel_id = (
-                    item
-                    .get("id", {})
-                    .get("channelId")
-                )
+                channel_id = item.get("id", {}).get("channelId")
 
                 if not channel_id:
                     continue
@@ -645,51 +544,26 @@ def search_channels(
                     {},
                 )
 
-                existing = (
-                    channel_lookup.setdefault(
-                        channel_id,
-                        {
-                            "channel_id": (
-                                channel_id
-                            ),
-                            "discovery_queries": [],
-                            "search_results": [],
-                        },
-                    )
+                existing = channel_lookup.setdefault(
+                    channel_id,
+                    {
+                        "channel_id": (channel_id),
+                        "discovery_queries": [],
+                        "search_results": [],
+                    },
                 )
 
-                if (
-                    query
-                    not in existing[
-                        "discovery_queries"
-                    ]
-                ):
+                if query not in existing["discovery_queries"]:
+                    existing["discovery_queries"].append(query)
 
-                    existing[
-                        "discovery_queries"
-                    ].append(query)
-
-                existing[
-                    "search_results"
-                ].append(
+                existing["search_results"].append(
                     {
                         "query": query,
-                        "title": snippet.get(
-                            "title"
-                        ),
-                        "description": (
-                            snippet.get(
-                                "description"
-                            )
-                        ),
-                        "published_at": (
-                            snippet.get(
-                                "publishedAt"
-                            )
-                        ),
+                        "title": snippet.get("title"),
+                        "description": (snippet.get("description")),
+                        "published_at": (snippet.get("publishedAt")),
                         "thumbnail_url": (
-                            snippet
-                            .get(
+                            snippet.get(
                                 "thumbnails",
                                 {},
                             )
@@ -699,40 +573,22 @@ def search_channels(
                             )
                             .get("url")
                         ),
-                        "raw": (
-                            item
-                            if config
-                            .include_raw_api_payloads
-                            else None
-                        ),
+                        "raw": (item if config.include_raw_api_payloads else None),
                     }
                 )
 
-                if (
-                    len(channel_lookup)
-                    >= config.max_creators
-                ):
+                if len(channel_lookup) >= config.max_creators:
                     break
 
-            if (
-                len(channel_lookup)
-                >= config.max_creators
-            ):
+            if len(channel_lookup) >= config.max_creators:
                 break
 
-            next_page_token = (
-                response.get(
-                    "nextPageToken"
-                )
-            )
+            next_page_token = response.get("nextPageToken")
 
             if not next_page_token:
                 break
 
-        if (
-            len(channel_lookup)
-            >= config.max_creators
-        ):
+        if len(channel_lookup) >= config.max_creators:
             break
 
     return (
@@ -745,6 +601,7 @@ def search_channels(
 # CHANNEL DETAILS
 # ============================================================
 
+
 def get_channel_details(
     channel_lookup: dict[
         str,
@@ -753,25 +610,18 @@ def get_channel_details(
     config: YouTubeCollectorConfig,
 ) -> list[dict[str, Any]]:
 
-    channel_ids = list(
-        channel_lookup.keys()
-    )
+    channel_ids = list(channel_lookup.keys())
 
-    channels: list[
-        dict[str, Any]
-    ] = []
+    channels: list[dict[str, Any]] = []
 
     for batch in chunked(
         channel_ids,
         50,
     ):
-
         response = youtube_get(
             "channels",
             {
-                "part": ",".join(
-                    CHANNEL_PARTS
-                ),
+                "part": ",".join(CHANNEL_PARTS),
                 "id": ",".join(batch),
                 "maxResults": 50,
             },
@@ -792,51 +642,34 @@ def get_channel_details(
 # RECENT PLAYLIST VIDEOS
 # ============================================================
 
+
 def get_recent_playlist_videos(
     channel: dict[str, Any],
     config: YouTubeCollectorConfig,
 ) -> list[dict[str, Any]]:
 
-    playlist_id = (
-        channel
-        .get("contentDetails", {})
-        .get("relatedPlaylists", {})
-        .get("uploads")
-    )
+    playlist_id = channel.get("contentDetails", {}).get("relatedPlaylists", {}).get("uploads")
 
     if not playlist_id:
         return []
 
-    playlist_items: list[
-        dict[str, Any]
-    ] = []
+    playlist_items: list[dict[str, Any]] = []
 
     next_page_token: str | None = None
 
-    while (
-        len(playlist_items)
-        < config.max_videos_per_creator
-    ):
-
-        remaining = (
-            config.max_videos_per_creator
-            - len(playlist_items)
-        )
+    while len(playlist_items) < config.max_videos_per_creator:
+        remaining = config.max_videos_per_creator - len(playlist_items)
 
         response = youtube_get(
             "playlistItems",
             {
-                "part": ",".join(
-                    PLAYLIST_ITEM_PARTS
-                ),
+                "part": ",".join(PLAYLIST_ITEM_PARTS),
                 "playlistId": playlist_id,
                 "maxResults": min(
                     50,
                     remaining,
                 ),
-                "pageToken": (
-                    next_page_token
-                ),
+                "pageToken": (next_page_token),
             },
             config,
         )
@@ -846,30 +679,20 @@ def get_recent_playlist_videos(
             [],
         )
 
-        playlist_items.extend(
-            items
-        )
+        playlist_items.extend(items)
 
-        next_page_token = (
-            response.get(
-                "nextPageToken"
-            )
-        )
+        next_page_token = response.get("nextPageToken")
 
-        if (
-            not next_page_token
-            or not items
-        ):
+        if not next_page_token or not items:
             break
 
-    return playlist_items[
-        :config.max_videos_per_creator
-    ]
+    return playlist_items[: config.max_videos_per_creator]
 
 
 # ============================================================
 # VIDEO DETAILS
 # ============================================================
+
 
 def get_video_details(
     video_ids: list[str],
@@ -888,13 +711,10 @@ def get_video_details(
         video_ids,
         50,
     ):
-
         response = youtube_get(
             "videos",
             {
-                "part": ",".join(
-                    VIDEO_PARTS
-                ),
+                "part": ",".join(VIDEO_PARTS),
                 "id": ",".join(batch),
                 "maxResults": 50,
             },
@@ -905,10 +725,7 @@ def get_video_details(
             "items",
             [],
         ):
-
-            video_lookup[
-                video["id"]
-            ] = video
+            video_lookup[video["id"]] = video
 
     return video_lookup
 
@@ -917,6 +734,7 @@ def get_video_details(
 # NORMALIZE VIDEO
 # ============================================================
 
+
 def normalize_video(
     playlist_item: dict[str, Any],
     video_resource: dict[str, Any] | None,
@@ -924,264 +742,113 @@ def normalize_video(
     include_raw: bool,
 ) -> dict[str, Any]:
 
-    content_details = (
-        playlist_item.get(
-            "contentDetails",
-            {},
-        )
+    content_details = playlist_item.get(
+        "contentDetails",
+        {},
     )
 
-    playlist_snippet = (
-        playlist_item.get(
-            "snippet",
-            {},
-        )
+    playlist_snippet = playlist_item.get(
+        "snippet",
+        {},
     )
 
-    video_id = (
-        content_details.get(
-            "videoId"
-        )
+    video_id = content_details.get("videoId")
+
+    video_resource = video_resource or {}
+
+    video_snippet = video_resource.get("snippet") or playlist_snippet
+
+    video_stats = video_resource.get(
+        "statistics",
+        {},
     )
 
-    video_resource = (
-        video_resource or {}
+    video_content = video_resource.get(
+        "contentDetails",
+        {},
     )
 
-    video_snippet = (
-        video_resource.get(
-            "snippet"
-        )
-        or playlist_snippet
+    video_status = video_resource.get(
+        "status",
+        {},
     )
 
-    video_stats = (
-        video_resource.get(
-            "statistics",
-            {},
-        )
-    )
+    duration = video_content.get("duration")
 
-    video_content = (
-        video_resource.get(
-            "contentDetails",
-            {},
-        )
-    )
-
-    video_status = (
-        video_resource.get(
-            "status",
-            {},
-        )
-    )
-
-    duration = (
-        video_content.get(
-            "duration"
-        )
-    )
-
-    duration_seconds = (
-        parse_youtube_duration_seconds(
-            duration
-        )
-    )
+    duration_seconds = parse_youtube_duration_seconds(duration)
 
     return {
-
         # ====================================================
         # IDENTITY
         # ====================================================
-
         "video_id": video_id,
-
-        "channel_id": (
-            video_snippet.get(
-                "channelId"
-            )
-            or playlist_snippet.get(
-                "channelId"
-            )
-        ),
-
+        "channel_id": (video_snippet.get("channelId") or playlist_snippet.get("channelId")),
         "creator_name": creator_name,
-
         # ====================================================
         # METADATA
         # ====================================================
-
-        "title": (
-            video_snippet.get(
-                "title"
-            )
-            or playlist_snippet.get(
-                "title"
-            )
-        ),
-
-        "description": (
-            video_snippet.get(
-                "description"
-            )
-            or playlist_snippet.get(
-                "description"
-            )
-        ),
-
-        "published_at": (
-            video_snippet.get(
-                "publishedAt"
-            )
-            or playlist_snippet.get(
-                "publishedAt"
-            )
-        ),
-
+        "title": (video_snippet.get("title") or playlist_snippet.get("title")),
+        "description": (video_snippet.get("description") or playlist_snippet.get("description")),
+        "published_at": (video_snippet.get("publishedAt") or playlist_snippet.get("publishedAt")),
         # ====================================================
         # PERFORMANCE
         # ====================================================
-
-        "views": safe_int(
-            video_stats.get(
-                "viewCount"
-            )
-        ),
-
-        "likes": safe_int(
-            video_stats.get(
-                "likeCount"
-            )
-        ),
-
-        "comments": safe_int(
-            video_stats.get(
-                "commentCount"
-            )
-        ),
-
+        "views": safe_int(video_stats.get("viewCount")),
+        "likes": safe_int(video_stats.get("likeCount")),
+        "comments": safe_int(video_stats.get("commentCount")),
         # ====================================================
         # CONTENT
         # ====================================================
-
-        "category_id": (
-            video_snippet.get(
-                "categoryId"
-            )
-        ),
-
+        "category_id": (video_snippet.get("categoryId")),
         "tags": (
             video_snippet.get(
                 "tags",
                 [],
             )
         ),
-
-        "default_language": (
-            video_snippet.get(
-                "defaultLanguage"
-            )
-        ),
-
-        "default_audio_language": (
-            video_snippet.get(
-                "defaultAudioLanguage"
-            )
-        ),
-
+        "default_language": (video_snippet.get("defaultLanguage")),
+        "default_audio_language": (video_snippet.get("defaultAudioLanguage")),
         # ====================================================
         # DURATION
         # ====================================================
-
         "duration_iso8601": duration,
-
-        "duration_seconds": (
-            duration_seconds
-        ),
-
+        "duration_seconds": (duration_seconds),
         # ====================================================
         # ADDITIONAL VIDEO METADATA
         # ====================================================
-
-        "caption_available": (
-            video_content.get(
-                "caption"
-            )
-        ),
-
-        "licensed_content": (
-            video_content.get(
-                "licensedContent"
-            )
-        ),
-
-        "privacy_status": (
-            video_status.get(
-                "privacyStatus"
-            )
-        ),
-
-        "embeddable": (
-            video_status.get(
-                "embeddable"
-            )
-        ),
-
-        "made_for_kids": (
-            video_status.get(
-                "madeForKids"
-            )
-        ),
-
+        "caption_available": (video_content.get("caption")),
+        "licensed_content": (video_content.get("licensedContent")),
+        "privacy_status": (video_status.get("privacyStatus")),
+        "embeddable": (video_status.get("embeddable")),
+        "made_for_kids": (video_status.get("madeForKids")),
         # ====================================================
         # TOPICS
         # ====================================================
-
         "topic_categories": (
-            video_resource
-            .get(
+            video_resource.get(
                 "topicDetails",
                 {},
-            )
-            .get(
+            ).get(
                 "topicCategories",
                 [],
             )
         ),
-
         # ====================================================
         # DERIVED VIDEO FEATURES
         # ====================================================
-
-        "days_since_published": (
-            calculate_days_since(
-                video_snippet.get(
-                    "publishedAt"
-                )
-            )
-        ),
-
-        "content_format": (
-            get_content_format(
-                duration_seconds
-            )
-        ),
-
+        "days_since_published": (calculate_days_since(video_snippet.get("publishedAt"))),
+        "content_format": (get_content_format(duration_seconds)),
         # ====================================================
         # RAW
         # ====================================================
-
-        "raw": (
-            video_resource
-            if include_raw
-            else None
-        ),
+        "raw": (video_resource if include_raw else None),
     }
 
 
 # ============================================================
 # TOP TAGS
 # ============================================================
+
 
 def extract_top_tags(
     videos: list[dict[str, Any]],
@@ -1191,33 +858,22 @@ def extract_top_tags(
     counter: Counter[str] = Counter()
 
     for video in videos:
-
         for tag in video.get(
             "tags",
             [],
         ):
-
-            cleaned = (
-                str(tag)
-                .strip()
-                .lower()
-            )
+            cleaned = str(tag).strip().lower()
 
             if cleaned:
-                counter[
-                    cleaned
-                ] += 1
+                counter[cleaned] += 1
 
-    return [
-        tag
-        for tag, _count
-        in counter.most_common(limit)
-    ]
+    return [tag for tag, _count in counter.most_common(limit)]
 
 
 # ============================================================
 # CREATOR CATEGORY
 # ============================================================
+
 
 def derive_creator_categories(
     discovery_queries: list[str],
@@ -1236,36 +892,20 @@ def derive_creator_categories(
     categories: list[str] = []
 
     for query in discovery_queries:
-
         for word in (
-            query
-            .lower()
+            query.lower()
             .replace(
                 "/",
                 " ",
             )
             .split()
         ):
-
-            if (
-                word not in ignored_words
-                and word not in categories
-            ):
-
-                categories.append(
-                    word
-                )
+            if word not in ignored_words and word not in categories:
+                categories.append(word)
 
     for tag in top_tags:
-
-        if (
-            tag not in ignored_words
-            and tag not in categories
-        ):
-
-            categories.append(
-                tag
-            )
+        if tag not in ignored_words and tag not in categories:
+            categories.append(tag)
 
     return categories[:limit]
 
@@ -1274,117 +914,63 @@ def derive_creator_categories(
 # CREATOR METRICS
 # ============================================================
 
+
 def calculate_creator_metrics(
     videos: list[dict[str, Any]],
 ) -> dict[str, Any]:
 
     if not videos:
-
         return {
-
             "videos_analyzed": 0,
-
             "average_views": 0.0,
-
             "median_views": 0.0,
-
             "average_likes": 0.0,
-
             "median_likes": 0.0,
-
             "average_comments": 0.0,
-
             "median_comments": 0.0,
-
             "engagement_rate_percent": 0.0,
-
             "total_recent_views": 0,
-
             "total_recent_likes": 0,
-
             "total_recent_comments": 0,
-
             "videos_last_30_days": 0,
-
             "videos_last_90_days": 0,
-
             "upload_frequency": 0.0,
-
             "short_form_ratio": 0.0,
-
             "long_form_ratio": 0.0,
-
             "average_duration_seconds": 0.0,
         }
 
-    views = [
-        safe_int(
-            video.get(
-                "views"
-            )
-        )
-        for video in videos
-    ]
+    views = [safe_int(video.get("views")) for video in videos]
 
-    likes = [
-        safe_int(
-            video.get(
-                "likes"
-            )
-        )
-        for video in videos
-    ]
+    likes = [safe_int(video.get("likes")) for video in videos]
 
-    comments = [
-        safe_int(
-            video.get(
-                "comments"
-            )
-        )
-        for video in videos
-    ]
+    comments = [safe_int(video.get("comments")) for video in videos]
 
     # ========================================================
     # VIEW METRICS
     # ========================================================
 
-    valid_views = [
-        value
-        for value in views
-        if value > 0
-    ]
+    valid_views = [value for value in views if value > 0]
 
-    average_views = safe_mean(
-        valid_views
-    )
+    average_views = safe_mean(valid_views)
 
-    median_views = safe_median(
-        valid_views
-    )
+    median_views = safe_median(valid_views)
 
     # ========================================================
     # LIKE METRICS
     # ========================================================
 
-    average_likes = safe_mean(
-        likes
-    )
+    average_likes = safe_mean(likes)
 
-    median_likes = safe_median(
-        likes
-    )
+    median_likes = safe_median(likes)
 
     # ========================================================
     # COMMENT METRICS
     # ========================================================
 
-    average_comments = safe_mean(
-        comments
-    )
+    average_comments = safe_mean(comments)
 
-    median_comments = safe_median(
-        comments
-    )
+    median_comments = safe_median(comments)
 
     # ========================================================
     # ENGAGEMENT RATE
@@ -1393,45 +979,18 @@ def calculate_creator_metrics(
     engagement_rate = 0.0
 
     if average_views > 0:
-
-        engagement_rate = (
-            (
-                average_likes
-                + average_comments
-            )
-            / average_views
-        ) * 100
+        engagement_rate = ((average_likes + average_comments) / average_views) * 100
 
     # ========================================================
     # RECENCY
     # ========================================================
 
     videos_last_30_days = sum(
-        1
-        for video in videos
-        if (
-            0
-            <= safe_int(
-                video.get(
-                    "days_since_published"
-                )
-            )
-            <= 30
-        )
+        1 for video in videos if (0 <= safe_int(video.get("days_since_published")) <= 30)
     )
 
     videos_last_90_days = sum(
-        1
-        for video in videos
-        if (
-            0
-            <= safe_int(
-                video.get(
-                    "days_since_published"
-                )
-            )
-            <= 90
-        )
+        1 for video in videos if (0 <= safe_int(video.get("days_since_published")) <= 90)
     )
 
     # ========================================================
@@ -1442,168 +1001,96 @@ def calculate_creator_metrics(
     # ========================================================
 
     observed_days = [
-        safe_int(
-            video.get(
-                "days_since_published"
-            )
-        )
+        safe_int(video.get("days_since_published"))
         for video in videos
-        if video.get(
-            "days_since_published"
-        ) is not None
+        if video.get("days_since_published") is not None
     ]
 
     upload_frequency = 0.0
 
     if observed_days:
-
-        oldest_days = max(
-            observed_days
-        )
+        oldest_days = max(observed_days)
 
         if oldest_days > 0:
-
-            upload_frequency = (
-                len(videos)
-                / oldest_days
-            ) * 30
+            upload_frequency = (len(videos) / oldest_days) * 30
 
     # ========================================================
     # CONTENT FORMAT
     # ========================================================
 
-    short_form_count = sum(
-        1
-        for video in videos
-        if video.get(
-            "content_format"
-        ) == "short_form"
-    )
+    short_form_count = sum(1 for video in videos if video.get("content_format") == "short_form")
 
-    long_form_count = sum(
-        1
-        for video in videos
-        if video.get(
-            "content_format"
-        ) == "long_form"
-    )
+    long_form_count = sum(1 for video in videos if video.get("content_format") == "long_form")
 
     video_count = len(videos)
 
-    short_form_ratio = (
-        short_form_count
-        / video_count
-        if video_count
-        else 0.0
-    )
+    short_form_ratio = short_form_count / video_count if video_count else 0.0
 
-    long_form_ratio = (
-        long_form_count
-        / video_count
-        if video_count
-        else 0.0
-    )
+    long_form_ratio = long_form_count / video_count if video_count else 0.0
 
     # ========================================================
     # DURATION
     # ========================================================
 
     durations = [
-        safe_int(
-            video.get(
-                "duration_seconds"
-            )
-        )
+        safe_int(video.get("duration_seconds"))
         for video in videos
-        if video.get(
-            "duration_seconds"
-        ) is not None
+        if video.get("duration_seconds") is not None
     ]
 
-    average_duration_seconds = (
-        safe_mean(
-            durations
-        )
-    )
+    average_duration_seconds = safe_mean(durations)
 
     # ========================================================
     # RETURN
     # ========================================================
 
     return {
-
         "videos_analyzed": video_count,
-
         "average_views": round(
             average_views,
             2,
         ),
-
         "median_views": round(
             median_views,
             2,
         ),
-
         "average_likes": round(
             average_likes,
             2,
         ),
-
         "median_likes": round(
             median_likes,
             2,
         ),
-
         "average_comments": round(
             average_comments,
             2,
         ),
-
         "median_comments": round(
             median_comments,
             2,
         ),
-
         "engagement_rate_percent": round(
             engagement_rate,
             4,
         ),
-
-        "total_recent_views": sum(
-            views
-        ),
-
-        "total_recent_likes": sum(
-            likes
-        ),
-
-        "total_recent_comments": sum(
-            comments
-        ),
-
-        "videos_last_30_days": (
-            videos_last_30_days
-        ),
-
-        "videos_last_90_days": (
-            videos_last_90_days
-        ),
-
+        "total_recent_views": sum(views),
+        "total_recent_likes": sum(likes),
+        "total_recent_comments": sum(comments),
+        "videos_last_30_days": (videos_last_30_days),
+        "videos_last_90_days": (videos_last_90_days),
         "upload_frequency": round(
             upload_frequency,
             4,
         ),
-
         "short_form_ratio": round(
             short_form_ratio,
             4,
         ),
-
         "long_form_ratio": round(
             long_form_ratio,
             4,
         ),
-
         "average_duration_seconds": round(
             average_duration_seconds,
             2,
@@ -1614,6 +1101,7 @@ def calculate_creator_metrics(
 # ============================================================
 # BUILD CREATOR RECORD
 # ============================================================
+
 
 def build_creator_record(
     channel: dict[str, Any],
@@ -1658,26 +1146,15 @@ def build_creator_record(
     # METRICS
     # ========================================================
 
-    metrics = (
-        calculate_creator_metrics(
-            videos
-        )
-    )
+    metrics = calculate_creator_metrics(videos)
 
-    subscriber_count = safe_int(
-        statistics.get(
-            "subscriberCount"
-        )
-    )
+    subscriber_count = safe_int(statistics.get("subscriberCount"))
 
-    average_views = metrics[
-        "average_views"
-    ]
+    average_views = metrics["average_views"]
 
     views_to_subscriber_ratio = (
         round(
-            average_views
-            / subscriber_count,
+            average_views / subscriber_count,
             4,
         )
         if subscriber_count
@@ -1688,129 +1165,66 @@ def build_creator_record(
     # TAGS / CATEGORY / FORMAT
     # ========================================================
 
-    top_tags = extract_top_tags(
-        videos
+    top_tags = extract_top_tags(videos)
+
+    discovery_queries = discovery.get(
+        "discovery_queries",
+        [],
     )
 
-    discovery_queries = (
-        discovery.get(
-            "discovery_queries",
-            [],
-        )
+    creator_categories = derive_creator_categories(
+        discovery_queries,
+        top_tags,
     )
 
-    creator_categories = (
-        derive_creator_categories(
-            discovery_queries,
-            top_tags,
-        )
-    )
-
-    content_formats = (
-        infer_content_formats(
-            videos
-        )
-    )
+    content_formats = infer_content_formats(videos)
 
     # ========================================================
     # CHANNEL AGE
     # ========================================================
 
-    channel_created_at = (
-        snippet.get(
-            "publishedAt"
-        )
-    )
+    channel_created_at = snippet.get("publishedAt")
 
-    channel_age_days = (
-        calculate_days_since(
-            channel_created_at
-        )
-    )
+    channel_age_days = calculate_days_since(channel_created_at)
 
     # ========================================================
     # URL
     # ========================================================
 
-    channel_url = (
-        "https://www.youtube.com/channel/"
-        f"{channel_id}"
-    )
+    channel_url = f"https://www.youtube.com/channel/{channel_id}"
 
-    custom_url = snippet.get(
-        "customUrl"
-    )
+    custom_url = snippet.get("customUrl")
 
     # ========================================================
     # CREATOR RECORD
     # ========================================================
 
     return {
-
         # ====================================================
         # INTERNAL IDENTITY
         # ====================================================
-
-        "creator_id": (
-            f"youtube:{channel_id}"
-        ),
-
+        "creator_id": (f"youtube:{channel_id}"),
         "platform": "youtube",
-
         # ====================================================
         # CREATOR-LEVEL
         # ====================================================
-
         "channel": {
-
             "channel_id": channel_id,
-
-            "creator_name": (
-                snippet.get(
-                    "title"
-                )
-            ),
-
-            "description": (
-                snippet.get(
-                    "description"
-                )
-            ),
-
+            "creator_name": (snippet.get("title")),
+            "description": (snippet.get("description")),
             "custom_url": custom_url,
-
             "channel_url": channel_url,
-
-            "country": (
-                snippet.get(
-                    "country"
-                )
-            ),
-
-            "channel_created_at": (
-                channel_created_at
-            ),
-
-            "default_language": (
-                snippet.get(
-                    "defaultLanguage"
-                )
-            ),
-
+            "country": (snippet.get("country")),
+            "channel_created_at": (channel_created_at),
+            "default_language": (snippet.get("defaultLanguage")),
             "channel_keywords": (
-                branding
-                .get(
+                branding.get(
                     "channel",
                     {},
-                )
-                .get(
-                    "keywords"
-                )
+                ).get("keywords")
             ),
-
             "thumbnail_url": (
-                snippet
-                .get(
+                snippet.get(
                     "thumbnails",
                     {},
                 )
@@ -1818,55 +1232,23 @@ def build_creator_record(
                     "high",
                     {},
                 )
-                .get(
-                    "url"
-                )
+                .get("url")
             ),
-
             "uploads_playlist_id": (
-                content_details
-                .get(
+                content_details.get(
                     "relatedPlaylists",
                     {},
-                )
-                .get(
-                    "uploads"
-                )
+                ).get("uploads")
             ),
-
-            "localized": (
-                snippet.get(
-                    "localized"
-                )
-            ),
+            "localized": (snippet.get("localized")),
         },
-
         # ====================================================
         # PUBLIC STATISTICS
         # ====================================================
-
         "public_statistics": {
-
-            "subscriber_count": (
-                subscriber_count
-            ),
-
-            "total_view_count": (
-                safe_int(
-                    statistics.get(
-                        "viewCount"
-                    )
-                )
-            ),
-
-            "video_count": (
-                safe_int(
-                    statistics.get(
-                        "videoCount"
-                    )
-                )
-            ),
-
+            "subscriber_count": (subscriber_count),
+            "total_view_count": (safe_int(statistics.get("viewCount"))),
+            "video_count": (safe_int(statistics.get("videoCount"))),
             "hidden_subscriber_count": (
                 statistics.get(
                     "hiddenSubscriberCount",
@@ -1874,51 +1256,25 @@ def build_creator_record(
                 )
             ),
         },
-
         # ====================================================
         # STATUS
         # ====================================================
-
         "status": {
-
-            "privacy_status": (
-                status.get(
-                    "privacyStatus"
-                )
-            ),
-
-            "is_linked": (
-                status.get(
-                    "isLinked"
-                )
-            ),
-
-            "long_uploads_status": (
-                status.get(
-                    "longUploadsStatus"
-                )
-            ),
-
-            "made_for_kids": (
-                status.get(
-                    "madeForKids"
-                )
-            ),
+            "privacy_status": (status.get("privacyStatus")),
+            "is_linked": (status.get("isLinked")),
+            "long_uploads_status": (status.get("longUploadsStatus")),
+            "made_for_kids": (status.get("madeForKids")),
         },
-
         # ====================================================
         # TOPICS
         # ====================================================
-
         "topics": {
-
             "topic_ids": (
                 topic_details.get(
                     "topicIds",
                     [],
                 )
             ),
-
             "topic_categories": (
                 topic_details.get(
                     "topicCategories",
@@ -1926,57 +1282,34 @@ def build_creator_record(
                 )
             ),
         },
-
         # ====================================================
         # BRANDING
         # ====================================================
-
         "branding": {
-
             "channel_keywords": (
-                branding
-                .get(
+                branding.get(
                     "channel",
                     {},
-                )
-                .get(
-                    "keywords"
-                )
+                ).get("keywords")
             ),
-
             "unsubscribed_trailer": (
-                branding
-                .get(
+                branding.get(
                     "channel",
                     {},
-                )
-                .get(
-                    "unsubscribedTrailer"
-                )
+                ).get("unsubscribedTrailer")
             ),
-
             "default_tab": (
-                branding
-                .get(
+                branding.get(
                     "channel",
                     {},
-                )
-                .get(
-                    "defaultTab"
-                )
+                ).get("defaultTab")
             ),
         },
-
         # ====================================================
         # DISCOVERY
         # ====================================================
-
         "discovery": {
-
-            "queries": (
-                discovery_queries
-            ),
-
+            "queries": (discovery_queries),
             "search_results": (
                 discovery.get(
                     "search_results",
@@ -1984,105 +1317,27 @@ def build_creator_record(
                 )
             ),
         },
-
         # ====================================================
         # DERIVED P0 FEATURES
         # ====================================================
-
         "derived_features": {
-
-            "channel_age_days": (
-                channel_age_days
-            ),
-
-            "average_views": (
-                metrics[
-                    "average_views"
-                ]
-            ),
-
-            "median_views": (
-                metrics[
-                    "median_views"
-                ]
-            ),
-
-            "average_likes": (
-                metrics[
-                    "average_likes"
-                ]
-            ),
-
-            "median_likes": (
-                metrics[
-                    "median_likes"
-                ]
-            ),
-
-            "average_comments": (
-                metrics[
-                    "average_comments"
-                ]
-            ),
-
-            "median_comments": (
-                metrics[
-                    "median_comments"
-                ]
-            ),
-
-            "engagement_rate": (
-                metrics[
-                    "engagement_rate_percent"
-                ]
-            ),
-
-            "views_to_subscriber_ratio": (
-                views_to_subscriber_ratio
-            ),
-
-            "videos_last_30_days": (
-                metrics[
-                    "videos_last_30_days"
-                ]
-            ),
-
-            "videos_last_90_days": (
-                metrics[
-                    "videos_last_90_days"
-                ]
-            ),
-
-            "upload_frequency": (
-                metrics[
-                    "upload_frequency"
-                ]
-            ),
-
-            "short_form_ratio": (
-                metrics[
-                    "short_form_ratio"
-                ]
-            ),
-
-            "long_form_ratio": (
-                metrics[
-                    "long_form_ratio"
-                ]
-            ),
-
-            "average_duration_seconds": (
-                metrics[
-                    "average_duration_seconds"
-                ]
-            ),
-
+            "channel_age_days": (channel_age_days),
+            "average_views": (metrics["average_views"]),
+            "median_views": (metrics["median_views"]),
+            "average_likes": (metrics["average_likes"]),
+            "median_likes": (metrics["median_likes"]),
+            "average_comments": (metrics["average_comments"]),
+            "median_comments": (metrics["median_comments"]),
+            "engagement_rate": (metrics["engagement_rate_percent"]),
+            "views_to_subscriber_ratio": (views_to_subscriber_ratio),
+            "videos_last_30_days": (metrics["videos_last_30_days"]),
+            "videos_last_90_days": (metrics["videos_last_90_days"]),
+            "upload_frequency": (metrics["upload_frequency"]),
+            "short_form_ratio": (metrics["short_form_ratio"]),
+            "long_form_ratio": (metrics["long_form_ratio"]),
+            "average_duration_seconds": (metrics["average_duration_seconds"]),
             "top_tags": top_tags,
-
-            "creator_category": (
-                creator_categories
-            ),
-
+            "creator_category": (creator_categories),
             "top_content_topics": (
                 topic_details.get(
                     "topicCategories",
@@ -2090,78 +1345,37 @@ def build_creator_record(
                 )
             ),
         },
-
         # ====================================================
         # RECENT VIDEO METRICS
         # ====================================================
-
         "recent_video_metrics": {
-
             **metrics,
-
-            "average_views_to_subscriber_ratio": (
-                views_to_subscriber_ratio
-            ),
-
+            "average_views_to_subscriber_ratio": (views_to_subscriber_ratio),
             "top_tags": top_tags,
-
-            "content_formats_observed": (
-                content_formats
-            ),
+            "content_formats_observed": (content_formats),
         },
-
         # ====================================================
         # BRAND BRIDGE FIELDS
         # ====================================================
-
         "brandbridge_fields": {
-
-            "creator_categories": (
-                creator_categories
-            ),
-
+            "creator_categories": (creator_categories),
             "platforms": {
-
                 "youtube": {
-
                     "channel_id": channel_id,
-
                     "channel_url": channel_url,
-
                     "custom_url": custom_url,
-
-                    "subscribers": (
-                        subscriber_count
-                    ),
-
-                    "average_views": (
-                        average_views
-                    ),
-
-                    "engagement_rate_percent": (
-                        metrics[
-                            "engagement_rate_percent"
-                        ]
-                    ),
+                    "subscribers": (subscriber_count),
+                    "average_views": (average_views),
+                    "engagement_rate_percent": (metrics["engagement_rate_percent"]),
                 }
             },
-
             # ------------------------------------------------
             # AUDIENCE
             # ------------------------------------------------
-
             "audience": {
-
-                "primary_country": (
-                    snippet.get(
-                        "country"
-                    )
-                ),
-
+                "primary_country": (snippet.get("country")),
                 "age_range": None,
-
                 "gender_split": None,
-
                 "missing_reason": (
                     "Audience demographics "
                     "require YouTube Analytics "
@@ -2169,97 +1383,54 @@ def build_creator_record(
                     "creator or synthetic data."
                 ),
             },
-
             # ------------------------------------------------
             # COLLABORATION
             # ------------------------------------------------
-
             "collaboration": {
-
                 "rate_card": None,
-
                 "business_email": None,
-
-                "preferred_content_formats": (
-                    content_formats
-                ),
-
+                "preferred_content_formats": (content_formats),
                 "missing_reason": (
                     "Rate card and contact details "
                     "are not available from the "
                     "public YouTube Data API key flow."
                 ),
             },
-
             # ------------------------------------------------
             # MATCHING FEATURES
             # ------------------------------------------------
-
             "matching_features": {
-
-                "category_similarity_inputs": (
-                    creator_categories
-                ),
-
-                "country_match_input": (
-                    snippet.get(
-                        "country"
-                    )
-                ),
-
-                "platform_match_input": (
-                    "youtube"
-                ),
-
-                "engagement_rate": (
-                    metrics[
-                        "engagement_rate_percent"
-                    ]
-                ),
-
-                "follower_score_input": (
-                    subscriber_count
-                ),
-
+                "category_similarity_inputs": (creator_categories),
+                "country_match_input": (snippet.get("country")),
+                "platform_match_input": ("youtube"),
+                "engagement_rate": (metrics["engagement_rate_percent"]),
+                "follower_score_input": (subscriber_count),
                 "semantic_similarity_text": " ".join(
                     value
                     for value in [
-                        snippet.get(
-                            "title"
-                        ),
-                        snippet.get(
-                            "description"
-                        ),
-                        " ".join(
-                            top_tags[:10]
-                        ),
+                        snippet.get("title"),
+                        snippet.get("description"),
+                        " ".join(top_tags[:10]),
                     ]
                     if value
                 ),
             },
         },
-
         # ====================================================
         # VIDEOS
         # ====================================================
-
         "recent_videos": videos,
-
         # ====================================================
         # RAW API RESPONSE
         # ====================================================
-
-        "raw": (
-            channel
-            if include_raw
-            else None
-        ),
+        "raw": (channel if include_raw else None),
     }
 
 
 # ============================================================
 # COMPLETE COLLECTION PIPELINE
 # ============================================================
+
 
 def collect_youtube_creator_data(
     config: YouTubeCollectorConfig,
@@ -2276,9 +1447,7 @@ def collect_youtube_creator_data(
         raw_search_pages,
     ) = search_channels(config)
 
-    print(
-        f"Found {len(channel_lookup)} unique channels."
-    )
+    print(f"Found {len(channel_lookup)} unique channels.")
 
     # ========================================================
     # STEP 2 — CHANNEL DETAILS
@@ -2289,9 +1458,7 @@ def collect_youtube_creator_data(
         config,
     )
 
-    print(
-        f"Fetched {len(channels)} channel records."
-    )
+    print(f"Fetched {len(channels)} channel records.")
 
     # ========================================================
     # STEP 3 — GET RECENT VIDEOS
@@ -2308,81 +1475,48 @@ def collect_youtube_creator_data(
         channels,
         start=1,
     ):
-
         channel_id = channel["id"]
 
-        playlist_items = (
-            get_recent_playlist_videos(
-                channel,
-                config,
-            )
+        playlist_items = get_recent_playlist_videos(
+            channel,
+            config,
         )
 
-        playlist_items_by_channel[
-            channel_id
-        ] = playlist_items
+        playlist_items_by_channel[channel_id] = playlist_items
 
         for item in playlist_items:
+            video_id = item.get(
+                "contentDetails",
+                {},
+            ).get("videoId")
 
-            video_id = (
-                item
-                .get(
-                    "contentDetails",
-                    {},
-                )
-                .get(
-                    "videoId"
-                )
-            )
+            if video_id and video_id not in all_video_ids:
+                all_video_ids.append(video_id)
 
-            if (
-                video_id
-                and video_id not in all_video_ids
-            ):
+        print(f"Collected video IDs for {index}/{len(channels)} channels")
 
-                all_video_ids.append(
-                    video_id
-                )
-
-        print(
-            "Collected video IDs for "
-            f"{index}/{len(channels)} channels"
-        )
-
-    print(
-        f"Found {len(all_video_ids)} unique videos."
-    )
+    print(f"Found {len(all_video_ids)} unique videos.")
 
     # ========================================================
     # STEP 4 — VIDEO DETAILS
     # ========================================================
 
-    video_detail_lookup = (
-        get_video_details(
-            all_video_ids,
-            config,
-        )
+    video_detail_lookup = get_video_details(
+        all_video_ids,
+        config,
     )
 
-    print(
-        "Fetched details for "
-        f"{len(video_detail_lookup)} videos."
-    )
+    print(f"Fetched details for {len(video_detail_lookup)} videos.")
 
     # ========================================================
     # STEP 5 — NORMALIZE EVERYTHING
     # ========================================================
 
-    creators: list[
-        dict[str, Any]
-    ] = []
+    creators: list[dict[str, Any]] = []
 
-    videos: list[
-        dict[str, Any]
-    ] = []
+    videos: list[dict[str, Any]] = []
 
     for channel in channels:
-
         channel_id = channel["id"]
 
         snippet = channel.get(
@@ -2390,48 +1524,27 @@ def collect_youtube_creator_data(
             {},
         )
 
-        normalized_videos: list[
-            dict[str, Any]
-        ] = []
+        normalized_videos: list[dict[str, Any]] = []
 
-        for item in (
-            playlist_items_by_channel.get(
-                channel_id,
-                [],
-            )
+        for item in playlist_items_by_channel.get(
+            channel_id,
+            [],
         ):
+            video_id = item.get(
+                "contentDetails",
+                {},
+            ).get("videoId")
 
-            video_id = (
-                item
-                .get(
-                    "contentDetails",
-                    {},
-                )
-                .get(
-                    "videoId"
-                )
+            normalized_video = normalize_video(
+                item,
+                video_detail_lookup.get(video_id),
+                snippet.get("title"),
+                config.include_raw_api_payloads,
             )
 
-            normalized_video = (
-                normalize_video(
-                    item,
-                    video_detail_lookup.get(
-                        video_id
-                    ),
-                    snippet.get(
-                        "title"
-                    ),
-                    config.include_raw_api_payloads,
-                )
-            )
+            normalized_videos.append(normalized_video)
 
-            normalized_videos.append(
-                normalized_video
-            )
-
-        videos.extend(
-            normalized_videos
-        )
+        videos.extend(normalized_videos)
 
         creators.append(
             build_creator_record(
@@ -2450,12 +1563,7 @@ def collect_youtube_creator_data(
     # ========================================================
 
     creators.sort(
-        key=lambda creator:
-            creator[
-                "public_statistics"
-            ][
-                "subscriber_count"
-            ],
+        key=lambda creator: creator["public_statistics"]["subscriber_count"],
         reverse=True,
     )
 
@@ -2466,113 +1574,43 @@ def collect_youtube_creator_data(
     # ========================================================
 
     return {
-
         "metadata": {
-
-            "project": (
-                "BrandBridge AI"
-            ),
-
-            "source": (
-                "YouTube Data API v3"
-            ),
-
-            "data_classification": (
-                "development_public_api_data"
-            ),
-
-            "started_at": (
-                started_at.isoformat()
-            ),
-
-            "finished_at": (
-                finished_at.isoformat()
-            ),
-
+            "project": ("BrandBridge AI"),
+            "source": ("YouTube Data API v3"),
+            "data_classification": ("development_public_api_data"),
+            "started_at": (started_at.isoformat()),
+            "finished_at": (finished_at.isoformat()),
             "duration_seconds": round(
-                (
-                    finished_at
-                    - started_at
-                ).total_seconds(),
+                (finished_at - started_at).total_seconds(),
                 2,
             ),
-
-            "creator_count": len(
-                creators
-            ),
-
-            "video_count": len(
-                videos
-            ),
-
+            "creator_count": len(creators),
+            "video_count": len(videos),
             "notes": [
-
-                "Only public YouTube "
-                "Data API fields are collected "
-                "using an API key.",
-
-                "YouTube Analytics audience "
-                "demographics require creator "
-                "OAuth authorization.",
-
-                "Rate cards and collaboration "
-                "preferences require BrandBridge "
-                "creator input.",
-
+                "Only public YouTube Data API fields are collected using an API key.",
+                "YouTube Analytics audience demographics require creator OAuth authorization.",
+                "Rate cards and collaboration preferences require BrandBridge creator input.",
                 "Creator category and top content "
                 "topics are derived features and "
                 "are not official YouTube classifications.",
-
-                "Activity and performance metrics "
-                "are calculated from the sampled "
-                "recent videos.",
-
+                "Activity and performance metrics are calculated from the sampled recent videos.",
                 "Country represents the channel's "
                 "public country metadata when available; "
                 "it does not represent audience geography.",
             ],
         },
-
         "collection_config": {
-
-            "search_queries": list(
-                config.search_queries
-            ),
-
-            "max_creators": (
-                config.max_creators
-            ),
-
-            "max_videos_per_creator": (
-                config.max_videos_per_creator
-            ),
-
-            "search_pages_per_query": (
-                config.search_pages_per_query
-            ),
-
-            "region_code": (
-                config.region_code
-            ),
-
-            "language_code": (
-                config.language_code
-            ),
-
-            "include_raw_api_payloads": (
-                config.include_raw_api_payloads
-            ),
+            "search_queries": list(config.search_queries),
+            "max_creators": (config.max_creators),
+            "max_videos_per_creator": (config.max_videos_per_creator),
+            "search_pages_per_query": (config.search_pages_per_query),
+            "region_code": (config.region_code),
+            "language_code": (config.language_code),
+            "include_raw_api_payloads": (config.include_raw_api_payloads),
         },
-
         "creators": creators,
-
         "videos": videos,
-
-        "raw_search_pages": (
-            raw_search_pages
-            if config.include_raw_api_payloads
-            else []
-        ),
+        "raw_search_pages": (raw_search_pages if config.include_raw_api_payloads else []),
     }
 
 
@@ -2580,16 +1618,13 @@ def collect_youtube_creator_data(
 # SAVE DATASET
 # ============================================================
 
+
 def save_dataset(
     dataset: dict[str, Any],
     output_dir: Path,
 ) -> dict[str, str]:
 
-    timestamp = datetime.now(
-        UTC
-    ).strftime(
-        "%Y%m%d_%H%M%S"
-    )
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
 
     output_dir.mkdir(
         parents=True,
@@ -2600,29 +1635,11 @@ def save_dataset(
     # TIMESTAMPED FILES
     # ========================================================
 
-    dataset_path = (
-        output_dir
-        / (
-            "brandbridge_youtube_dataset_"
-            f"{timestamp}.json"
-        )
-    )
+    dataset_path = output_dir / (f"brandbridge_youtube_dataset_{timestamp}.json")
 
-    creators_path = (
-        output_dir
-        / (
-            "brandbridge_youtube_creators_"
-            f"{timestamp}.json"
-        )
-    )
+    creators_path = output_dir / (f"brandbridge_youtube_creators_{timestamp}.json")
 
-    videos_path = (
-        output_dir
-        / (
-            "brandbridge_youtube_videos_"
-            f"{timestamp}.json"
-        )
-    )
+    videos_path = output_dir / (f"brandbridge_youtube_videos_{timestamp}.json")
 
     write_json(
         dataset_path,
@@ -2643,20 +1660,11 @@ def save_dataset(
     # LATEST FILES
     # ========================================================
 
-    latest_dataset_path = (
-        output_dir
-        / "brandbridge_youtube_dataset.latest.json"
-    )
+    latest_dataset_path = output_dir / "brandbridge_youtube_dataset.latest.json"
 
-    latest_creators_path = (
-        output_dir
-        / "brandbridge_youtube_creators.latest.json"
-    )
+    latest_creators_path = output_dir / "brandbridge_youtube_creators.latest.json"
 
-    latest_videos_path = (
-        output_dir
-        / "brandbridge_youtube_videos.latest.json"
-    )
+    latest_videos_path = output_dir / "brandbridge_youtube_videos.latest.json"
 
     write_json(
         latest_dataset_path,
@@ -2674,30 +1682,12 @@ def save_dataset(
     )
 
     return {
-
-        "dataset": str(
-            dataset_path
-        ),
-
-        "creators": str(
-            creators_path
-        ),
-
-        "videos": str(
-            videos_path
-        ),
-
-        "latest_dataset": str(
-            latest_dataset_path
-        ),
-
-        "latest_creators": str(
-            latest_creators_path
-        ),
-
-        "latest_videos": str(
-            latest_videos_path
-        ),
+        "dataset": str(dataset_path),
+        "creators": str(creators_path),
+        "videos": str(videos_path),
+        "latest_dataset": str(latest_dataset_path),
+        "latest_creators": str(latest_creators_path),
+        "latest_videos": str(latest_videos_path),
     }
 
 
@@ -2705,12 +1695,12 @@ def save_dataset(
 # SEARCH QUERY PARSING
 # ============================================================
 
+
 def parse_search_queries(
     values: list[str] | None,
 ) -> tuple[str, ...]:
 
     if not values:
-
         return get_list_env(
             "YOUTUBE_SEARCH_QUERIES",
             DEFAULT_SEARCH_QUERIES,
@@ -2719,12 +1709,7 @@ def parse_search_queries(
     queries: list[str] = []
 
     for value in values:
-
-        queries.extend(
-            query.strip()
-            for query in value.split(",")
-            if query.strip()
-        )
+        queries.extend(query.strip() for query in value.split(",") if query.strip())
 
     return tuple(queries)
 
@@ -2733,63 +1718,29 @@ def parse_search_queries(
 # BUILD CONFIG
 # ============================================================
 
+
 def build_config_from_args(
     args: argparse.Namespace,
 ) -> YouTubeCollectorConfig:
 
-    api_key = get_env(
-        "YOUTUBE_API_KEY"
-    )
+    api_key = get_env("YOUTUBE_API_KEY")
 
     if not api_key:
-
         raise YouTubeCollectionError(
-            "YOUTUBE_API_KEY is missing. "
-            "Add it to your local .env "
-            "or shell environment."
+            "YOUTUBE_API_KEY is missing. Add it to your local .env or shell environment."
         )
 
     return YouTubeCollectorConfig(
-
         api_key=api_key,
-
-        output_dir=Path(
-            args.output_dir
-        ),
-
-        search_queries=(
-            parse_search_queries(
-                args.search_query
-            )
-        ),
-
-        max_creators=(
-            args.max_creators
-        ),
-
-        max_videos_per_creator=(
-            args.max_videos_per_creator
-        ),
-
-        search_pages_per_query=(
-            args.search_pages_per_query
-        ),
-
-        region_code=(
-            args.region_code
-        ),
-
-        language_code=(
-            args.language_code
-        ),
-
-        request_delay_seconds=(
-            args.request_delay_seconds
-        ),
-
-        include_raw_api_payloads=(
-            not args.no_raw
-        ),
+        output_dir=Path(args.output_dir),
+        search_queries=(parse_search_queries(args.search_query)),
+        max_creators=(args.max_creators),
+        max_videos_per_creator=(args.max_videos_per_creator),
+        search_pages_per_query=(args.search_pages_per_query),
+        region_code=(args.region_code),
+        language_code=(args.language_code),
+        request_delay_seconds=(args.request_delay_seconds),
+        include_raw_api_payloads=(not args.no_raw),
     )
 
 
@@ -2797,13 +1748,11 @@ def build_config_from_args(
 # ARGUMENT PARSER
 # ============================================================
 
+
 def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser(
-        description=(
-            "Collect public YouTube creator "
-            "data for BrandBridge AI analysis."
-        )
+        description=("Collect public YouTube creator data for BrandBridge AI analysis.")
     )
 
     parser.add_argument(
@@ -2852,21 +1801,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--search-query",
         action="append",
-        help=(
-            "Search query. Can be repeated "
-            "or comma-separated."
-        ),
+        help=("Search query. Can be repeated or comma-separated."),
     )
 
     parser.add_argument(
         "--output-dir",
-        default=str(
-            DEFAULT_OUTPUT_DIR
-        ),
-        help=(
-            "Directory where JSON output "
-            "files will be written."
-        ),
+        default=str(DEFAULT_OUTPUT_DIR),
+        help=("Directory where JSON output files will be written."),
     )
 
     parser.add_argument(
@@ -2881,10 +1822,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--no-raw",
         action="store_true",
-        help=(
-            "Exclude raw API payloads "
-            "from the generated dataset."
-        ),
+        help=("Exclude raw API payloads from the generated dataset."),
     )
 
     return parser.parse_args()
@@ -2894,31 +1832,20 @@ def parse_args() -> argparse.Namespace:
 # MAIN
 # ============================================================
 
+
 def main() -> None:
 
     try:
+        config = build_config_from_args(parse_args())
 
-        config = (
-            build_config_from_args(
-                parse_args()
-            )
-        )
+        dataset = collect_youtube_creator_data(config)
 
-        dataset = (
-            collect_youtube_creator_data(
-                config
-            )
-        )
-
-        output_files = (
-            save_dataset(
-                dataset,
-                config.output_dir,
-            )
+        output_files = save_dataset(
+            dataset,
+            config.output_dir,
         )
 
     except YouTubeCollectionError as error:
-
         print(
             f"ERROR: {error}",
             file=sys.stderr,
@@ -2929,12 +1856,8 @@ def main() -> None:
     print(
         json.dumps(
             {
-                "metadata": dataset[
-                    "metadata"
-                ],
-                "output_files": (
-                    output_files
-                ),
+                "metadata": dataset["metadata"],
+                "output_files": (output_files),
             },
             indent=2,
         )

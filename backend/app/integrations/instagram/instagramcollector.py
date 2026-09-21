@@ -2,13 +2,12 @@ import json
 import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import requests
 from dotenv import load_dotenv
-
 
 # ============================================================
 # CONFIGURATION
@@ -27,10 +26,7 @@ if not ACCESS_TOKEN:
 
 BASE_URL = "https://graph.instagram.com"
 
-API_VERSION = os.getenv(
-    "INSTAGRAM_API_VERSION",
-    ""
-).strip()
+API_VERSION = os.getenv("INSTAGRAM_API_VERSION", "").strip()
 
 if API_VERSION:
     API_BASE = f"{BASE_URL}/{API_VERSION}"
@@ -50,24 +46,11 @@ else:
 # parents[4] -> BrandBridge_AI
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
-OUTPUT_DIR = (
-    PROJECT_ROOT
-    / "data"
-    / "raw"
-    / "instagram"
-)
+OUTPUT_DIR = PROJECT_ROOT / "data" / "raw" / "instagram"
 
-OUTPUT_FILE = (
-    OUTPUT_DIR
-    / "instagram_business_data.json"
-)
+OUTPUT_FILE = OUTPUT_DIR / "instagram_business_data.json"
 
-MAX_MEDIA_ITEMS = int(
-    os.getenv(
-        "INSTAGRAM_MAX_MEDIA_ITEMS",
-        "100"
-    )
-)
+MAX_MEDIA_ITEMS = int(os.getenv("INSTAGRAM_MAX_MEDIA_ITEMS", "100"))
 
 
 # ============================================================
@@ -135,10 +118,11 @@ CAROUSEL_CHILD_FIELDS = [
 # HTTP REQUEST
 # ============================================================
 
+
 def api_get(
     endpoint: str,
-    params: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    params: dict[str, Any] | None = None,
+) -> dict[str, Any]:
 
     if params is None:
         params = {}
@@ -150,22 +134,14 @@ def api_get(
     if endpoint.startswith("http"):
         url = endpoint
     else:
-        url = (
-            f"{API_BASE}/"
-            f"{endpoint.lstrip('/')}"
-        )
+        url = f"{API_BASE}/{endpoint.lstrip('/')}"
 
-    safe_params = {
-        key: value
-        for key, value in params.items()
-        if key != "access_token"
-    }
+    safe_params = {key: value for key, value in params.items() if key != "access_token"}
 
     print(f"\nGET {url}")
     print(f"Parameters: {safe_params}")
 
     try:
-
         response = requests.get(
             url,
             params=params,
@@ -173,29 +149,17 @@ def api_get(
         )
 
     except requests.RequestException as exc:
+        raise RuntimeError(f"Network error: {exc}") from exc
 
-        raise RuntimeError(
-            f"Network error: {exc}"
-        ) from exc
-
-    print(
-        f"HTTP Status: "
-        f"{response.status_code}"
-    )
+    print(f"HTTP Status: {response.status_code}")
 
     try:
-
         data = response.json()
 
     except ValueError:
-
-        raise RuntimeError(
-            "Instagram API returned "
-            "non-JSON response."
-        )
+        raise RuntimeError("Instagram API returned non-JSON response.")from None
 
     if not response.ok:
-
         print(
             json.dumps(
                 data,
@@ -204,10 +168,7 @@ def api_get(
             )
         )
 
-        raise RuntimeError(
-            f"Instagram API request failed "
-            f"with HTTP {response.status_code}"
-        )
+        raise RuntimeError(f"Instagram API request failed with HTTP {response.status_code}")
 
     return data
 
@@ -227,13 +188,13 @@ def api_get(
 #     null is stored
 # ============================================================
 
+
 def probe_field(
     endpoint: str,
     field: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
 
     try:
-
         response = api_get(
             endpoint,
             {
@@ -242,7 +203,6 @@ def probe_field(
         )
 
         if field in response:
-
             return {
                 "field": field,
                 "available": True,
@@ -258,7 +218,6 @@ def probe_field(
         }
 
     except RuntimeError as exc:
-
         return {
             "field": field,
             "available": False,
@@ -271,7 +230,8 @@ def probe_field(
 # PROFILE
 # ============================================================
 
-def fetch_profile() -> Dict[str, Any]:
+
+def fetch_profile() -> dict[str, Any]:
 
     print("\n" + "=" * 70)
     print("PROBING ALL PROFILE FIELDS")
@@ -282,11 +242,7 @@ def fetch_profile() -> Dict[str, Any]:
     field_status = {}
 
     for field in PROFILE_FIELDS:
-
-        print(
-            f"\nTesting profile field: "
-            f"{field}"
-        )
+        print(f"\nTesting profile field: {field}")
 
         result = probe_field(
             "me",
@@ -296,9 +252,7 @@ def fetch_profile() -> Dict[str, Any]:
         profile[field] = result["value"]
 
         field_status[field] = {
-            "available": result[
-                "available"
-            ],
+            "available": result["available"],
             "error": result["error"],
         }
 
@@ -316,19 +270,18 @@ def fetch_profile() -> Dict[str, Any]:
 # the account currently has ZERO media.
 # ============================================================
 
-def empty_media_record() -> Dict[str, Any]:
 
-    return {
-        field: None
-        for field in MEDIA_FIELDS
-    }
+def empty_media_record() -> dict[str, Any]:
+
+    return {field: None for field in MEDIA_FIELDS}
 
 
 # ============================================================
 # FETCH MEDIA
 # ============================================================
 
-def fetch_media() -> Dict[str, Any]:
+
+def fetch_media() -> dict[str, Any]:
 
     print("\n" + "=" * 70)
     print("FETCHING INSTAGRAM MEDIA")
@@ -338,10 +291,7 @@ def fetch_media() -> Dict[str, Any]:
 
     after = None
 
-    available_fields = {
-        field: None
-        for field in MEDIA_FIELDS
-    }
+    available_fields = {field: None for field in MEDIA_FIELDS}
 
     field_status = {
         field: {
@@ -360,14 +310,9 @@ def fetch_media() -> Dict[str, Any]:
     print("\nTesting media fields...")
 
     for field in MEDIA_FIELDS:
-
-        print(
-            f"\nTesting media field: "
-            f"{field}"
-        )
+        print(f"\nTesting media field: {field}")
 
         try:
-
             params = {
                 "fields": field,
                 "limit": 1,
@@ -389,7 +334,6 @@ def fetch_media() -> Dict[str, Any]:
             available_fields[field] = True
 
         except RuntimeError as exc:
-
             field_status[field] = {
                 "available": False,
                 "error": str(exc),
@@ -401,11 +345,7 @@ def fetch_media() -> Dict[str, Any]:
     # Build list of fields that Meta accepted
     # --------------------------------------------------------
 
-    supported_fields = [
-        field
-        for field in MEDIA_FIELDS
-        if available_fields[field] is True
-    ]
+    supported_fields = [field for field in MEDIA_FIELDS if available_fields[field] is True]
 
     print("\n" + "-" * 70)
     print("SUPPORTED MEDIA FIELDS")
@@ -419,7 +359,6 @@ def fetch_media() -> Dict[str, Any]:
     print("-" * 70)
 
     for field in MEDIA_FIELDS:
-
         if available_fields[field] is False:
             print(f"  [NULL] {field}")
 
@@ -428,7 +367,6 @@ def fetch_media() -> Dict[str, Any]:
     # --------------------------------------------------------
 
     if not supported_fields:
-
         return {
             "data": [],
             "schema": empty_media_record(),
@@ -439,18 +377,12 @@ def fetch_media() -> Dict[str, Any]:
     # Fetch actual media using all supported fields
     # --------------------------------------------------------
 
-    fields_string = ",".join(
-        supported_fields
-    )
+    fields_string = ",".join(supported_fields)
 
     after = None
 
     while len(all_media) < MAX_MEDIA_ITEMS:
-
-        remaining = (
-            MAX_MEDIA_ITEMS
-            - len(all_media)
-        )
+        remaining = MAX_MEDIA_ITEMS - len(all_media)
 
         limit = min(
             25,
@@ -466,17 +398,13 @@ def fetch_media() -> Dict[str, Any]:
             params["after"] = after
 
         try:
-
             response = api_get(
                 "me/media",
                 params,
             )
 
         except RuntimeError as exc:
-
-            print(
-                "\nCould not fetch media:"
-            )
+            print("\nCould not fetch media:")
             print(exc)
 
             break
@@ -493,24 +421,14 @@ def fetch_media() -> Dict[str, Any]:
             break
 
         for item in page_data:
-
             normalized = {}
 
             for field in MEDIA_FIELDS:
+                normalized[field] = item.get(field)
 
-                normalized[field] = (
-                    item.get(field)
-                )
+            all_media.append(normalized)
 
-            all_media.append(
-                normalized
-            )
-
-        print(
-            f"Retrieved "
-            f"{len(page_data)} media items "
-            f"(total: {len(all_media)})"
-        )
+        print(f"Retrieved {len(page_data)} media items (total: {len(all_media)})")
 
         paging = response.get(
             "paging",
@@ -522,9 +440,7 @@ def fetch_media() -> Dict[str, Any]:
             {},
         )
 
-        after = cursors.get(
-            "after"
-        )
+        after = cursors.get("after")
 
         if not after:
             break
@@ -532,9 +448,7 @@ def fetch_media() -> Dict[str, Any]:
         time.sleep(0.2)
 
     return {
-        "data": all_media[
-            :MAX_MEDIA_ITEMS
-        ],
+        "data": all_media[:MAX_MEDIA_ITEMS],
         "schema": empty_media_record(),
         "field_status": field_status,
     }
@@ -544,16 +458,15 @@ def fetch_media() -> Dict[str, Any]:
 # CAROUSEL CHILDREN
 # ============================================================
 
+
 def fetch_carousel_children(
     media_id: str,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
 
     supported_fields = []
 
     for field in CAROUSEL_CHILD_FIELDS:
-
         try:
-
             api_get(
                 f"{media_id}/children",
                 {
@@ -561,23 +474,17 @@ def fetch_carousel_children(
                 },
             )
 
-            supported_fields.append(
-                field
-            )
+            supported_fields.append(field)
 
         except RuntimeError:
-
             pass
 
     if not supported_fields:
         return []
 
-    fields_string = ",".join(
-        supported_fields
-    )
+    fields_string = ",".join(supported_fields)
 
     try:
-
         response = api_get(
             f"{media_id}/children",
             {
@@ -593,36 +500,25 @@ def fetch_carousel_children(
         normalized_children = []
 
         for child in children:
-
             normalized = {}
 
             for field in CAROUSEL_CHILD_FIELDS:
+                normalized[field] = child.get(field)
 
-                normalized[field] = (
-                    child.get(field)
-                )
-
-            normalized_children.append(
-                normalized
-            )
+            normalized_children.append(normalized)
 
         return normalized_children
 
     except RuntimeError:
-
         return []
 
 
 def enrich_carousels(
-    media: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
+    media: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
 
     for item in media:
-
-        if (
-            item.get("media_type")
-            != "CAROUSEL_ALBUM"
-        ):
+        if item.get("media_type") != "CAROUSEL_ALBUM":
             continue
 
         media_id = item.get("id")
@@ -630,11 +526,7 @@ def enrich_carousels(
         if not media_id:
             continue
 
-        item["children"] = (
-            fetch_carousel_children(
-                media_id
-            )
-        )
+        item["children"] = fetch_carousel_children(media_id)
 
     return media
 
@@ -642,6 +534,7 @@ def enrich_carousels(
 # ============================================================
 # TOKEN VALIDATION
 # ============================================================
+
 
 def validate_token():
 
@@ -652,8 +545,7 @@ def validate_token():
     response = api_get(
         "me",
         {
-            "fields":
-                "id,username",
+            "fields": "id,username",
         },
     )
 
@@ -666,10 +558,11 @@ def validate_token():
 # SUMMARY
 # ============================================================
 
+
 def build_summary(
-    profile: Dict[str, Any],
-    media: List[Dict[str, Any]],
-) -> Dict[str, Any]:
+    profile: dict[str, Any],
+    media: list[dict[str, Any]],
+) -> dict[str, Any]:
 
     media_types = {}
     product_types = {}
@@ -679,46 +572,33 @@ def build_summary(
     total_views = 0
 
     for item in media:
-
-        media_type = item.get(
-            "media_type"
-        )
+        media_type = item.get("media_type")
 
         if media_type:
-
             media_types[media_type] = (
                 media_types.get(
                     media_type,
                     0,
-                ) + 1
+                )
+                + 1
             )
 
-        product_type = item.get(
-            "media_product_type"
-        )
+        product_type = item.get("media_product_type")
 
         if product_type:
-
-            product_types[
-                product_type
-            ] = (
+            product_types[product_type] = (
                 product_types.get(
                     product_type,
                     0,
-                ) + 1
+                )
+                + 1
             )
 
-        likes = item.get(
-            "like_count"
-        )
+        likes = item.get("like_count")
 
-        comments = item.get(
-            "comments_count"
-        )
+        comments = item.get("comments_count")
 
-        views = item.get(
-            "view_count"
-        )
+        views = item.get("view_count")
 
         if isinstance(
             likes,
@@ -741,14 +621,10 @@ def build_summary(
     return {
         "media_collected": len(media),
         "media_types": media_types,
-        "media_product_types":
-            product_types,
-        "total_likes":
-            total_likes,
-        "total_comments":
-            total_comments,
-        "total_views":
-            total_views,
+        "media_product_types": product_types,
+        "total_likes": total_likes,
+        "total_comments": total_comments,
+        "total_views": total_views,
     }
 
 
@@ -756,8 +632,9 @@ def build_summary(
 # SAVE JSON
 # ============================================================
 
+
 def save_json(
-    data: Dict[str, Any],
+    data: dict[str, Any],
 ) -> None:
 
     OUTPUT_DIR.mkdir(
@@ -769,7 +646,6 @@ def save_json(
         "w",
         encoding="utf-8",
     ) as file:
-
         json.dump(
             data,
             file,
@@ -777,68 +653,50 @@ def save_json(
             ensure_ascii=False,
         )
 
-    print(
-        "\nJSON saved to:"
-    )
+    print("\nJSON saved to:")
 
-    print(
-        OUTPUT_FILE.resolve()
-    )
+    print(OUTPUT_FILE.resolve())
 
 
 # ============================================================
 # MAIN
 # ============================================================
 
+
 def main():
 
     print("\n")
     print("=" * 70)
-    print(
-        "BRANDBRIDGE AI - "
-        "INSTAGRAM BUSINESS FIELD EXPLORER"
-    )
+    print("BRANDBRIDGE AI - INSTAGRAM BUSINESS FIELD EXPLORER")
     print("=" * 70)
 
     # --------------------------------------------------------
     # 1. Validate token
     # --------------------------------------------------------
 
-    token_validation = (
-        validate_token()
-    )
+    token_validation = validate_token()
 
     # --------------------------------------------------------
     # 2. Profile
     # --------------------------------------------------------
 
-    profile_result = (
-        fetch_profile()
-    )
+    profile_result = fetch_profile()
 
-    profile = (
-        profile_result["data"]
-    )
+    profile = profile_result["data"]
 
     # --------------------------------------------------------
     # 3. Media
     # --------------------------------------------------------
 
-    media_result = (
-        fetch_media()
-    )
+    media_result = fetch_media()
 
-    media = (
-        media_result["data"]
-    )
+    media = media_result["data"]
 
     # --------------------------------------------------------
     # 4. Carousel children
     # --------------------------------------------------------
 
-    media = enrich_carousels(
-        media
-    )
+    media = enrich_carousels(media)
 
     # --------------------------------------------------------
     # 5. Summary
@@ -854,48 +712,18 @@ def main():
     # --------------------------------------------------------
 
     output = {
-
-        "source":
-            "Instagram Graph API",
-
-        "api_setup":
-            "Instagram Login",
-
-        "account_type":
-            "BUSINESS",
-
-        "collector":
-            "BrandBridge AI",
-
-        "collected_at":
-            datetime.now(
-                timezone.utc
-            ).isoformat(),
-
-        "token_validation":
-            token_validation,
-
+        "source": "Instagram Graph API",
+        "api_setup": "Instagram Login",
+        "account_type": "BUSINESS",
+        "collector": "BrandBridge AI",
+        "collected_at": datetime.now(UTC).isoformat(),
+        "token_validation": token_validation,
         "profile": profile,
-
-        "profile_field_status":
-            profile_result[
-                "field_status"
-            ],
-
+        "profile_field_status": profile_result["field_status"],
         "media": media,
-
-        "media_schema":
-            media_result[
-                "schema"
-            ],
-
-        "media_field_status":
-            media_result[
-                "field_status"
-            ],
-
-        "summary":
-            summary,
+        "media_schema": media_result["schema"],
+        "media_field_status": media_result["field_status"],
+        "summary": summary,
     }
 
     # --------------------------------------------------------
@@ -912,25 +740,13 @@ def main():
     print("COLLECTION COMPLETE")
     print("=" * 70)
 
-    print(
-        f"\nProfile fields tested: "
-        f"{len(PROFILE_FIELDS)}"
-    )
+    print(f"\nProfile fields tested: {len(PROFILE_FIELDS)}")
 
-    print(
-        f"Media fields tested: "
-        f"{len(MEDIA_FIELDS)}"
-    )
+    print(f"Media fields tested: {len(MEDIA_FIELDS)}")
 
-    print(
-        f"Media records collected: "
-        f"{len(media)}"
-    )
+    print(f"Media records collected: {len(media)}")
 
-    print(
-        f"\nOutput:"
-        f"\n{OUTPUT_FILE.resolve()}"
-    )
+    print(f"\nOutput:\n{OUTPUT_FILE.resolve()}")
 
 
 if __name__ == "__main__":

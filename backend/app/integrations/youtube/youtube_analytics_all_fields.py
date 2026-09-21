@@ -2,12 +2,11 @@ import json
 import time
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
 
 # ============================================================
 # BRAND BRIDGE AI
@@ -38,26 +37,13 @@ from googleapiclient.errors import HttpError
 
 BASE_DIR = Path(__file__).resolve().parent
 
-TOKEN_FILE = (
-    BASE_DIR
-    / "oauth"
-    / "token.json"
-)
+TOKEN_FILE = BASE_DIR / "oauth" / "token.json"
 
 PROJECT_ROOT = BASE_DIR.parents[4]
 
-OUTPUT_DIR = (
-    PROJECT_ROOT
-    / "data"
-    / "raw"
-    / "youtube"
-    / "analytics"
-)
+OUTPUT_DIR = PROJECT_ROOT / "data" / "raw" / "youtube" / "analytics"
 
-OUTPUT_FILE = (
-    OUTPUT_DIR
-    / "youtube_analytics_all_fields.json"
-)
+OUTPUT_FILE = OUTPUT_DIR / "youtube_analytics_all_fields.json"
 
 
 # ============================================================
@@ -74,9 +60,7 @@ YOUTUBE_VERSION = "v3"
 # Use a historical range rather than today.
 END_DATE = date.today() - timedelta(days=3)
 
-START_DATE = (
-    END_DATE - timedelta(days=30)
-)
+START_DATE = END_DATE - timedelta(days=30)
 
 MAX_TOP_RESULTS = 200
 
@@ -246,51 +230,41 @@ DIMENSIONS = [
 # ============================================================
 
 REPORTS = [
-
     # --------------------------------------------------------
     # BASIC CHANNEL TOTALS
     # --------------------------------------------------------
-
     {
         "name": "channel_overview",
         "dimensions": "",
         "metrics": GENERAL_METRICS + MONETARY_METRICS,
     },
-
     # --------------------------------------------------------
     # DAILY ACTIVITY
     # --------------------------------------------------------
-
     {
         "name": "daily_activity",
         "dimensions": "day",
         "metrics": GENERAL_METRICS + MONETARY_METRICS,
     },
-
     # --------------------------------------------------------
     # MONTHLY ACTIVITY
     # --------------------------------------------------------
-
     {
         "name": "monthly_activity",
         "dimensions": "month",
         "metrics": GENERAL_METRICS + MONETARY_METRICS,
     },
-
     # --------------------------------------------------------
     # COUNTRY
     # --------------------------------------------------------
-
     {
         "name": "country_activity",
         "dimensions": "country",
         "metrics": GENERAL_METRICS + MONETARY_METRICS,
     },
-
     # --------------------------------------------------------
     # CITY
     # --------------------------------------------------------
-
     {
         "name": "city_activity",
         "dimensions": "city",
@@ -304,11 +278,9 @@ REPORTS = [
         "sort": "-views",
         "maxResults": 250,
     },
-
     # --------------------------------------------------------
     # DMA
     # --------------------------------------------------------
-
     {
         "name": "dma_activity",
         "dimensions": "dma",
@@ -322,11 +294,9 @@ REPORTS = [
         "filters": "country==US",
         "sort": "-views",
     },
-
     # --------------------------------------------------------
     # US PROVINCES
     # --------------------------------------------------------
-
     {
         "name": "province_activity",
         "dimensions": "province",
@@ -354,11 +324,9 @@ REPORTS = [
         ],
         "filters": "country==US",
     },
-
     # --------------------------------------------------------
     # PLAYBACK LOCATION
     # --------------------------------------------------------
-
     {
         "name": "playback_location",
         "dimensions": "insightPlaybackLocationType",
@@ -368,11 +336,9 @@ REPORTS = [
             "estimatedMinutesWatched",
         ],
     },
-
     # --------------------------------------------------------
     # TRAFFIC SOURCE
     # --------------------------------------------------------
-
     {
         "name": "traffic_source",
         "dimensions": "insightTrafficSourceType",
@@ -382,11 +348,9 @@ REPORTS = [
             "estimatedMinutesWatched",
         ],
     },
-
     # --------------------------------------------------------
     # DEVICE
     # --------------------------------------------------------
-
     {
         "name": "device_type",
         "dimensions": "deviceType",
@@ -396,11 +360,9 @@ REPORTS = [
             "estimatedMinutesWatched",
         ],
     },
-
     # --------------------------------------------------------
     # OPERATING SYSTEM
     # --------------------------------------------------------
-
     {
         "name": "operating_system",
         "dimensions": "operatingSystem",
@@ -410,11 +372,9 @@ REPORTS = [
             "estimatedMinutesWatched",
         ],
     },
-
     # --------------------------------------------------------
     # DEVICE + OS
     # --------------------------------------------------------
-
     {
         "name": "device_operating_system",
         "dimensions": "deviceType,operatingSystem",
@@ -424,36 +384,28 @@ REPORTS = [
             "estimatedMinutesWatched",
         ],
     },
-
     # --------------------------------------------------------
     # DEMOGRAPHICS
     # --------------------------------------------------------
-
     {
         "name": "viewer_demographics",
         "dimensions": "ageGroup,gender",
         "metrics": DEMOGRAPHIC_METRICS,
     },
-
     # --------------------------------------------------------
     # SHARING SERVICE
     # --------------------------------------------------------
-
     {
         "name": "sharing_service",
         "dimensions": "sharingService",
         "metrics": SHARING_METRICS,
     },
-
     # --------------------------------------------------------
     # PLAYBACK DETAILS
     # --------------------------------------------------------
-
     {
         "name": "playback_live_on_demand",
-        "dimensions": (
-            "liveOrOnDemand"
-        ),
+        "dimensions": ("liveOrOnDemand"),
         "metrics": [
             "engagedViews",
             "views",
@@ -463,12 +415,9 @@ REPORTS = [
             "averageViewDuration",
         ],
     },
-
     {
         "name": "playback_average_percentage",
-        "dimensions": (
-            "subscribedStatus"
-        ),
+        "dimensions": ("subscribedStatus"),
         "metrics": [
             "engagedViews",
             "views",
@@ -479,11 +428,9 @@ REPORTS = [
             "averageViewPercentage",
         ],
     },
-
     # --------------------------------------------------------
     # TOP VIDEOS
     # --------------------------------------------------------
-
     {
         "name": "top_videos",
         "dimensions": "video",
@@ -491,11 +438,9 @@ REPORTS = [
         "sort": "-views",
         "maxResults": 200,
     },
-
     # --------------------------------------------------------
     # TOP VIDEOS BY PRODUCT
     # --------------------------------------------------------
-
     {
         "name": "top_videos_by_product",
         "dimensions": "video",
@@ -511,35 +456,29 @@ REPORTS = [
         "sort": "-views",
         "maxResults": 200,
     },
-
     # --------------------------------------------------------
     # PLAYLIST BASIC
     #
     # Playlist filter is inserted dynamically.
     # --------------------------------------------------------
-
     {
         "name": "playlist_basic",
         "dimensions": "",
         "metrics": PLAYLIST_METRICS,
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # PLAYLIST TIME
     # --------------------------------------------------------
-
     {
         "name": "playlist_daily",
         "dimensions": "day",
         "metrics": PLAYLIST_METRICS,
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # PLAYLIST COUNTRY
     # --------------------------------------------------------
-
     {
         "name": "playlist_country",
         "dimensions": "country",
@@ -551,104 +490,82 @@ REPORTS = [
         ],
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # PLAYLIST DEVICE
     # --------------------------------------------------------
-
     {
         "name": "playlist_device",
         "dimensions": "deviceType",
         "metrics": PLAYLIST_METRICS,
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # PLAYLIST OPERATING SYSTEM
     # --------------------------------------------------------
-
     {
         "name": "playlist_operating_system",
         "dimensions": "operatingSystem",
         "metrics": PLAYLIST_METRICS,
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # PLAYLIST DEVICE + OS
     # --------------------------------------------------------
-
     {
         "name": "playlist_device_os",
-        "dimensions": (
-            "deviceType,operatingSystem"
-        ),
+        "dimensions": ("deviceType,operatingSystem"),
         "metrics": PLAYLIST_METRICS,
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # PLAYLIST DEMOGRAPHICS
     # --------------------------------------------------------
-
     {
         "name": "playlist_demographics",
         "dimensions": "ageGroup,gender",
         "metrics": DEMOGRAPHIC_METRICS,
         "requires_playlist": True,
     },
-
     # --------------------------------------------------------
     # MEMBERSHIP CANCELLATIONS
     # --------------------------------------------------------
-
     {
         "name": "membership_cancellations",
-        "dimensions": (
-            "membershipsCancellationSurveyReason"
-        ),
+        "dimensions": ("membershipsCancellationSurveyReason"),
         "metrics": MEMBERSHIP_METRICS,
     },
-
     # --------------------------------------------------------
     # AD PERFORMANCE
     # --------------------------------------------------------
-
     {
         "name": "ad_performance",
         "dimensions": "adType",
         "metrics": AD_METRICS,
     },
-
     # --------------------------------------------------------
     # DAILY AD PERFORMANCE
     # --------------------------------------------------------
-
     {
         "name": "daily_ad_performance",
         "dimensions": "adType,day",
         "metrics": AD_METRICS,
     },
-
     # --------------------------------------------------------
     # AUDIENCE RETENTION
     #
     # Requires a real video ID.
     # --------------------------------------------------------
-
     {
         "name": "audience_retention",
         "dimensions": "elapsedVideoTimeRatio",
         "metrics": RETENTION_METRICS,
         "requires_video": True,
     },
-
     # --------------------------------------------------------
     # LIVESTREAM CONCURRENT VIEWERS
     #
     # Requires a livestream video.
     # --------------------------------------------------------
-
     {
         "name": "livestream_concurrent_viewers",
         "dimensions": "livestreamPosition",
@@ -662,21 +579,15 @@ REPORTS = [
 # AUTHENTICATION
 # ============================================================
 
+
 def get_credentials() -> Credentials:
 
     if not TOKEN_FILE.exists():
-
         raise FileNotFoundError(
-            f"OAuth token not found:\n"
-            f"{TOKEN_FILE}\n\n"
-            f"Run the OAuth authorization script first."
+            f"OAuth token not found:\n{TOKEN_FILE}\n\nRun the OAuth authorization script first."
         )
 
-    credentials = (
-        Credentials.from_authorized_user_file(
-            str(TOKEN_FILE)
-        )
-    )
+    credentials = Credentials.from_authorized_user_file(str(TOKEN_FILE))
 
     return credentials
 
@@ -707,9 +618,10 @@ def get_youtube_service():
 # YOUTUBE CHANNEL INFORMATION
 # ============================================================
 
+
 def get_channel_information(
     youtube_service,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
 
     response = (
         youtube_service.channels()
@@ -726,7 +638,6 @@ def get_channel_information(
     )
 
     if not items:
-
         return {
             "channel_id": None,
             "channel_title": None,
@@ -738,23 +649,11 @@ def get_channel_information(
 
     return {
         "channel_id": channel.get("id"),
-        "channel_title": (
-            channel
-            .get("snippet", {})
-            .get("title")
-        ),
+        "channel_title": (channel.get("snippet", {}).get("title")),
         "uploads_playlist_id": (
-            channel
-            .get("contentDetails", {})
-            .get("relatedPlaylists", {})
-            .get("uploads")
+            channel.get("contentDetails", {}).get("relatedPlaylists", {}).get("uploads")
         ),
-        "statistics": (
-            channel.get(
-                "statistics",
-                {}
-            )
-        ),
+        "statistics": (channel.get("statistics", {})),
     }
 
 
@@ -762,10 +661,11 @@ def get_channel_information(
 # GET VIDEO ID
 # ============================================================
 
+
 def get_latest_video_id(
     youtube_service,
-    uploads_playlist_id: Optional[str],
-) -> Optional[str]:
+    uploads_playlist_id: str | None,
+) -> str | None:
 
     if not uploads_playlist_id:
         return None
@@ -788,24 +688,21 @@ def get_latest_video_id(
     if not items:
         return None
 
-    return (
-        items[0]
-        .get("contentDetails", {})
-        .get("videoId")
-    )
+    return items[0].get("contentDetails", {}).get("videoId")
 
 
 # ============================================================
 # API QUERY
 # ============================================================
 
+
 def execute_query(
     service,
-    report: Dict[str, Any],
+    report: dict[str, Any],
     metric: str,
-    video_id: Optional[str] = None,
-    playlist_id: Optional[str] = None,
-) -> Dict[str, Any]:
+    video_id: str | None = None,
+    playlist_id: str | None = None,
+) -> dict[str, Any]:
 
     params = {
         "ids": "channel==MINE",
@@ -814,68 +711,38 @@ def execute_query(
         "metrics": metric,
     }
 
-    dimensions = report.get(
-        "dimensions"
-    )
+    dimensions = report.get("dimensions")
 
     if dimensions:
         params["dimensions"] = dimensions
 
     filters = []
 
-    if report.get(
-        "requires_video"
-    ):
-
+    if report.get("requires_video"):
         if not video_id:
-            raise ValueError(
-                "No video available."
-            )
+            raise ValueError("No video available.")
 
-        filters.append(
-            f"video=={video_id}"
-        )
+        filters.append(f"video=={video_id}")
 
-    if report.get(
-        "requires_playlist"
-    ):
-
+    if report.get("requires_playlist"):
         if not playlist_id:
-            raise ValueError(
-                "No playlist available."
-            )
+            raise ValueError("No playlist available.")
 
-        filters.append(
-            f"playlist=={playlist_id}"
-        )
+        filters.append(f"playlist=={playlist_id}")
 
     if report.get("filters"):
-
-        filters.append(
-            report["filters"]
-        )
+        filters.append(report["filters"])
 
     if filters:
-
-        params["filters"] = ";".join(
-            filters
-        )
+        params["filters"] = ";".join(filters)
 
     if report.get("sort"):
-
         params["sort"] = report["sort"]
 
     if report.get("maxResults"):
+        params["maxResults"] = report["maxResults"]
 
-        params["maxResults"] = (
-            report["maxResults"]
-        )
-
-    response = (
-        service.reports()
-        .query(**params)
-        .execute()
-    )
+    response = service.reports().query(**params).execute()
 
     return response
 
@@ -884,16 +751,16 @@ def execute_query(
 # RUN ONE METRIC
 # ============================================================
 
+
 def run_metric(
     service,
-    report: Dict[str, Any],
+    report: dict[str, Any],
     metric: str,
-    video_id: Optional[str],
-    playlist_id: Optional[str],
-) -> Dict[str, Any]:
+    video_id: str | None,
+    playlist_id: str | None,
+) -> dict[str, Any]:
 
     try:
-
         response = execute_query(
             service=service,
             report=report,
@@ -920,7 +787,6 @@ def run_metric(
         }
 
     except ValueError as exc:
-
         return {
             "available": False,
             "value": None,
@@ -929,7 +795,6 @@ def run_metric(
         }
 
     except HttpError as exc:
-
         return {
             "available": False,
             "value": None,
@@ -938,7 +803,6 @@ def run_metric(
         }
 
     except Exception as exc:
-
         return {
             "available": False,
             "value": None,
@@ -951,28 +815,22 @@ def run_metric(
 # RUN REPORT
 # ============================================================
 
+
 def run_report(
     service,
-    report: Dict[str, Any],
-    video_id: Optional[str],
-    playlist_id: Optional[str],
-) -> Dict[str, Any]:
+    report: dict[str, Any],
+    video_id: str | None,
+    playlist_id: str | None,
+) -> dict[str, Any]:
 
     print("\n" + "-" * 70)
-    print(
-        f"REPORT: "
-        f"{report['name']}"
-    )
+    print(f"REPORT: {report['name']}")
     print("-" * 70)
 
     results = {}
 
     for metric in report["metrics"]:
-
-        print(
-            f"Testing metric: "
-            f"{metric}"
-        )
+        print(f"Testing metric: {metric}")
 
         result = run_metric(
             service=service,
@@ -985,26 +843,15 @@ def run_report(
         results[metric] = result
 
         if result["available"]:
-
-            print(
-                f"  [AVAILABLE]"
-            )
+            print("  [AVAILABLE]")
 
         else:
+            print("  [NULL]")
 
-            print(
-                f"  [NULL]"
-            )
-
-        time.sleep(
-            REQUEST_DELAY_SECONDS
-        )
+        time.sleep(REQUEST_DELAY_SECONDS)
 
     return {
-        "dimensions": report.get(
-            "dimensions",
-            ""
-        ),
+        "dimensions": report.get("dimensions", ""),
         "results": results,
     }
 
@@ -1013,49 +860,30 @@ def run_report(
 # FIELD STATUS
 # ============================================================
 
+
 def build_metric_catalog(
-    report_results: Dict[str, Any],
-) -> Dict[str, Any]:
+    report_results: dict[str, Any],
+) -> dict[str, Any]:
 
     catalog = {}
 
-    for report_name, report_data in (
-        report_results.items()
-    ):
-
-        for metric, result in (
-            report_data
-            .get("results", {})
-            .items()
-        ):
-
+    for report_name, report_data in report_results.items():
+        for metric, result in report_data.get("results", {}).items():
             if metric not in catalog:
-
                 catalog[metric] = {
                     "tested": True,
                     "available": False,
                     "reports": [],
                 }
 
-            if result.get(
-                "available"
-            ):
+            if result.get("available"):
+                catalog[metric]["available"] = True
 
-                catalog[metric][
-                    "available"
-                ] = True
-
-            catalog[metric][
-                "reports"
-            ].append(
+            catalog[metric]["reports"].append(
                 {
                     "report": report_name,
-                    "available": result.get(
-                        "available"
-                    ),
-                    "error": result.get(
-                        "error"
-                    ),
+                    "available": result.get("available"),
+                    "error": result.get("error"),
                 }
             )
 
@@ -1066,7 +894,8 @@ def build_metric_catalog(
 # DIMENSION CATALOG
 # ============================================================
 
-def build_dimension_catalog() -> Dict[str, Any]:
+
+def build_dimension_catalog() -> dict[str, Any]:
 
     return {
         dimension: {
@@ -1082,26 +911,17 @@ def build_dimension_catalog() -> Dict[str, Any]:
 # MAIN
 # ============================================================
 
+
 def main():
 
     print("\n")
     print("=" * 70)
-    print(
-        "BRANDBRIDGE AI"
-    )
-    print(
-        "YOUTUBE ANALYTICS"
-    )
-    print(
-        "ALL FIELD / REPORT EXPLORER"
-    )
+    print("BRANDBRIDGE AI")
+    print("YOUTUBE ANALYTICS")
+    print("ALL FIELD / REPORT EXPLORER")
     print("=" * 70)
 
-    print(
-        f"\nDate range:"
-        f"\n{START_DATE}"
-        f" -> {END_DATE}"
-    )
+    print(f"\nDate range:\n{START_DATE} -> {END_DATE}")
 
     print(
         "\nNOTE:"
@@ -1114,51 +934,30 @@ def main():
     # Services
     # --------------------------------------------------------
 
-    analytics_service = (
-        get_analytics_service()
-    )
+    analytics_service = get_analytics_service()
 
-    youtube_service = (
-        get_youtube_service()
-    )
+    youtube_service = get_youtube_service()
 
     # --------------------------------------------------------
     # Channel
     # --------------------------------------------------------
 
-    channel = (
-        get_channel_information(
-            youtube_service
-        )
-    )
+    channel = get_channel_information(youtube_service)
 
-    print(
-        "\nChannel:"
-        f" {channel.get('channel_title')}"
-    )
+    print(f"\nChannel: {channel.get('channel_title')}")
 
-    print(
-        "Channel ID:"
-        f" {channel.get('channel_id')}"
-    )
+    print(f"Channel ID: {channel.get('channel_id')}")
 
     # --------------------------------------------------------
     # Video
     # --------------------------------------------------------
 
-    latest_video_id = (
-        get_latest_video_id(
-            youtube_service,
-            channel.get(
-                "uploads_playlist_id"
-            ),
-        )
+    latest_video_id = get_latest_video_id(
+        youtube_service,
+        channel.get("uploads_playlist_id"),
     )
 
-    print(
-        "\nLatest video:"
-        f" {latest_video_id}"
-    )
+    print(f"\nLatest video: {latest_video_id}")
 
     # --------------------------------------------------------
     # Run reports
@@ -1167,106 +966,55 @@ def main():
     report_results = {}
 
     for report in REPORTS:
-
         result = run_report(
             service=analytics_service,
             report=report,
             video_id=latest_video_id,
-            playlist_id=channel.get(
-                "uploads_playlist_id"
-            ),
+            playlist_id=channel.get("uploads_playlist_id"),
         )
 
-        report_results[
-            report["name"]
-        ] = result
+        report_results[report["name"]] = result
 
     # --------------------------------------------------------
     # Catalog
     # --------------------------------------------------------
 
-    metric_catalog = (
-        build_metric_catalog(
-            report_results
-        )
-    )
+    metric_catalog = build_metric_catalog(report_results)
 
-    dimension_catalog = (
-        build_dimension_catalog()
-    )
+    dimension_catalog = build_dimension_catalog()
 
     # --------------------------------------------------------
     # Summary
     # --------------------------------------------------------
 
-    available_metrics = [
-        name
-        for name, info
-        in metric_catalog.items()
-        if info["available"]
-    ]
+    available_metrics = [name for name, info in metric_catalog.items() if info["available"]]
 
-    unavailable_metrics = [
-        name
-        for name, info
-        in metric_catalog.items()
-        if not info["available"]
-    ]
+    unavailable_metrics = [name for name, info in metric_catalog.items() if not info["available"]]
 
     # --------------------------------------------------------
     # Final JSON
     # --------------------------------------------------------
 
     output = {
-
-        "source":
-            "YouTube Analytics API",
-
-        "api_version":
-            ANALYTICS_VERSION,
-
-        "collector":
-            "BrandBridge AI",
-
-        "collector_type":
-            "all_field_explorer",
-
-        "collected_at":
-            date.today().isoformat(),
-
+        "source": "YouTube Analytics API",
+        "api_version": ANALYTICS_VERSION,
+        "collector": "BrandBridge AI",
+        "collector_type": "all_field_explorer",
+        "collected_at": date.today().isoformat(),
         "date_range": {
-            "start":
-                START_DATE.isoformat(),
-            "end":
-                END_DATE.isoformat(),
+            "start": START_DATE.isoformat(),
+            "end": END_DATE.isoformat(),
         },
-
         "channel": channel,
-
-        "test_video_id":
-            latest_video_id,
-
-        "documented_dimensions":
-            dimension_catalog,
-
+        "test_video_id": latest_video_id,
+        "documented_dimensions": dimension_catalog,
         "metric_catalog": {
-
-            "total_tested":
-                len(metric_catalog),
-
-            "available":
-                available_metrics,
-
-            "unavailable":
-                unavailable_metrics,
-
-            "details":
-                metric_catalog,
+            "total_tested": len(metric_catalog),
+            "available": available_metrics,
+            "unavailable": unavailable_metrics,
+            "details": metric_catalog,
         },
-
-        "reports":
-            report_results,
-
+        "reports": report_results,
     }
 
     # --------------------------------------------------------
@@ -1282,7 +1030,6 @@ def main():
         "w",
         encoding="utf-8",
     ) as file:
-
         json.dump(
             output,
             file,
@@ -1299,28 +1046,15 @@ def main():
     print("COLLECTION COMPLETE")
     print("=" * 70)
 
-    print(
-        f"\nMetrics tested:"
-        f" {len(metric_catalog)}"
-    )
+    print(f"\nMetrics tested: {len(metric_catalog)}")
 
-    print(
-        f"Available:"
-        f" {len(available_metrics)}"
-    )
+    print(f"Available: {len(available_metrics)}")
 
-    print(
-        f"Unavailable:"
-        f" {len(unavailable_metrics)}"
-    )
+    print(f"Unavailable: {len(unavailable_metrics)}")
 
-    print(
-        "\nOutput:"
-    )
+    print("\nOutput:")
 
-    print(
-        OUTPUT_FILE.resolve()
-    )
+    print(OUTPUT_FILE.resolve())
 
 
 if __name__ == "__main__":
