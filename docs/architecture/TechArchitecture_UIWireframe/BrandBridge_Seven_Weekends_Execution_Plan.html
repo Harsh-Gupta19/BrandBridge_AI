@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seven Weekends to BrandBridge</title>
+<style>
+:root{
+  --ink:#171a21; --ink2:#454b59; --ink3:#6c7386;
+  --paper:#f7f7f6; --surface:#ffffff; --surface2:#f0f1f4;
+  --line:#dfe1e8; --lineStrong:#c2c6d3;
+  --brand:#4b3fd4; --brandSoft:#ecebff;
+  --creator:#c9421d; --creatorSoft:#ffeee8;
+  --ok:#15703f; --okSoft:#e3f4ea;
+  --warn:#8a5a00; --warnSoft:#fcf1dc;
+  --gap:#a8261a; --gapSoft:#fdeceb;
+  --sA:#4b3fd4; --sAs:#ecebff;   /* platform  */
+  --sB:#0f6f86; --sBs:#e2f2f6;   /* frontend  */
+  --sC:#8a5a00; --sCs:#fcf1dc;   /* ml        */
+  --sD:#6f2f9e; --sDs:#f4e9fb;   /* genai     */
+  --sE:#15703f; --sEs:#e3f4ea;   /* integr    */
+  --code:#f3f4f8;
+  --shadow:0 1px 2px rgba(20,24,34,.06),0 10px 26px -18px rgba(20,24,34,.26);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e7eaf1; --ink2:#b0b7c7; --ink3:#848da4;
+    --paper:#111319; --surface:#181b22; --surface2:#20242d;
+    --line:#2b303b; --lineStrong:#3d4453;
+    --brand:#9d95ff; --brandSoft:#241f45;
+    --creator:#ff9270; --creatorSoft:#38201a;
+    --ok:#5cd490; --okSoft:#132f1e;
+    --warn:#e0aa4e; --warnSoft:#31270f;
+    --gap:#ff857c; --gapSoft:#391a18;
+    --sA:#9d95ff; --sAs:#241f45;
+    --sB:#5cc5de; --sBs:#0e2c34;
+    --sC:#e0aa4e; --sCs:#31270f;
+    --sD:#c294ee; --sDs:#2c1b3a;
+    --sE:#5cd490; --sEs:#132f1e;
+    --code:#13161c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -20px rgba(0,0,0,.85);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e7eaf1; --ink2:#b0b7c7; --ink3:#848da4;
+  --paper:#111319; --surface:#181b22; --surface2:#20242d;
+  --line:#2b303b; --lineStrong:#3d4453;
+  --brand:#9d95ff; --brandSoft:#241f45;
+  --creator:#ff9270; --creatorSoft:#38201a;
+  --ok:#5cd490; --okSoft:#132f1e;
+  --warn:#e0aa4e; --warnSoft:#31270f;
+  --gap:#ff857c; --gapSoft:#391a18;
+  --sA:#9d95ff; --sAs:#241f45;
+  --sB:#5cc5de; --sBs:#0e2c34;
+  --sC:#e0aa4e; --sCs:#31270f;
+  --sD:#c294ee; --sDs:#2c1b3a;
+  --sE:#5cd490; --sEs:#132f1e;
+  --code:#13161c;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -20px rgba(0,0,0,.85);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:0}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0 0 .8em} p:last-child{margin-bottom:0}
+a{color:var(--brand)}
+code{font-family:var(--mono);font-size:.87em;background:var(--code);border:1px solid var(--line);border-radius:4px;padding:.06em .32em}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1180px;margin:0 auto}
+
+/* masthead */
+.mast{padding-block:40px 26px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);font-weight:600}
+.mast h1{font-family:var(--cond);font-size:clamp(34px,6.6vw,60px);font-weight:700;letter-spacing:-.015em;margin:.16em 0 .18em}
+.mast .sub{font-size:17px;color:var(--ink2);max-width:66ch}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:24px}
+.stats div{background:var(--surface);padding:12px 14px}
+.stats .v{font-family:var(--cond);font-size:27px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stats .k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-top:5px}
+
+section{padding-block:34px 4px}
+section>h2{font-family:var(--cond);font-size:clamp(24px,3.6vw,32px);font-weight:700;border-top:2px solid var(--ink);padding-top:14px;margin-bottom:8px}
+section>.lede{color:var(--ink2);max-width:74ch;margin-bottom:18px;font-size:15.5px}
+h3{font-family:var(--cond);font-size:21px;font-weight:600;margin:30px 0 10px}
+ul.tight{margin:0 0 1em;padding-left:1.15em;display:flex;flex-direction:column;gap:5px;max-width:78ch}
+ul.tight li::marker{color:var(--ink3)}
+.prose{max-width:78ch}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap}
+.sA{color:var(--sA);background:var(--sAs);border-color:color-mix(in srgb,var(--sA) 32%,transparent)}
+.sB{color:var(--sB);background:var(--sBs);border-color:color-mix(in srgb,var(--sB) 32%,transparent)}
+.sC{color:var(--sC);background:var(--sCs);border-color:color-mix(in srgb,var(--sC) 32%,transparent)}
+.sD{color:var(--sD);background:var(--sDs);border-color:color-mix(in srgb,var(--sD) 32%,transparent)}
+.sE{color:var(--sE);background:var(--sEs);border-color:color-mix(in srgb,var(--sE) 32%,transparent)}
+.cOk{color:var(--ok);background:var(--okSoft);border-color:color-mix(in srgb,var(--ok) 32%,transparent)}
+.cWarn{color:var(--warn);background:var(--warnSoft);border-color:color-mix(in srgb,var(--warn) 32%,transparent)}
+.cGap{color:var(--gap);background:var(--gapSoft);border-color:color-mix(in srgb,var(--gap) 32%,transparent)}
+.cPlain{color:var(--ink2);background:var(--surface2);border-color:var(--line)}
+
+/* tables */
+.tw{overflow-x:auto;margin:14px 0 22px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--surface2);font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--lineStrong)}
+tbody tr:last-child td{border-bottom:none}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+
+/* figure */
+figure{margin:18px 0 26px}
+.figbox{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:16px 14px;overflow-x:auto}
+.figbox svg{display:block;min-width:760px;width:100%;height:auto}
+figcaption{font-size:12.5px;color:var(--ink3);margin-top:9px;font-style:italic}
+.s-l{font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;fill:var(--ink)}
+.s-s{font-family:"IBM Plex Mono",monospace;font-size:8.5px;fill:var(--ink3);font-weight:500}
+.s-h{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:12px;font-weight:700;fill:var(--ink)}
+
+/* weekend blocks */
+.wk{border:1px solid var(--line);border-radius:13px;background:var(--surface);margin:20px 0 26px;overflow:hidden;box-shadow:var(--shadow)}
+.wk>header{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;padding:15px 18px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.wk .no{font-family:var(--cond);font-size:26px;font-weight:700;color:var(--brand);line-height:1}
+.wk .ttl{font-family:var(--cond);font-size:21px;font-weight:700;flex:1 1 240px}
+.wk .dates{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.04em}
+.wkgoal{padding:13px 18px;border-bottom:1px solid var(--line);font-size:14.4px;background:color-mix(in srgb,var(--brandSoft) 45%,transparent)}
+.wkgoal b{font-weight:600}
+.lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:1px;background:var(--line)}
+.lane{background:var(--surface);padding:13px 15px}
+.lane h4{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;margin:0 0 4px;font-weight:600}
+.lane .who{font-size:12px;color:var(--ink3);margin-bottom:8px}
+.lane ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:13.2px}
+.lane li{padding-left:13px;position:relative;line-height:1.5}
+.lane li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:1.5px;background:currentColor;opacity:.5}
+.lane.a{color:var(--sA)} .lane.b{color:var(--sB)} .lane.c{color:var(--sC)}
+.lane.d{color:var(--sD)} .lane.e{color:var(--sE)}
+.lane li{color:var(--ink)}
+.lane.a h4{color:var(--sA)} .lane.b h4{color:var(--sB)} .lane.c h4{color:var(--sC)}
+.lane.d h4{color:var(--sD)} .lane.e h4{color:var(--sE)}
+.gate{padding:13px 18px;border-top:1px solid var(--line);background:var(--surface2);font-size:13.6px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.gate .t{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding-top:3px;min-width:104px}
+.gate .body{flex:1 1 320px}
+
+/* notes */
+.note{border:1px solid var(--line);border-left:3px solid var(--brand);background:var(--surface);border-radius:0 9px 9px 0;padding:13px 16px;margin:16px 0;font-size:14.2px}
+.note.w{border-left-color:var(--warn)} .note.g{border-left-color:var(--gap)} .note.o{border-left-color:var(--ok)}
+.note .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(262px,1fr));gap:14px;margin:14px 0 22px}
+.card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px 16px}
+.card h4{margin:0 0 6px;font-size:15px}
+.footer{border-top:2px solid var(--ink);padding-block:22px 46px;font-size:13px;color:var(--ink3);margin-top:22px}
+@media (max-width:560px){ .lanes{grid-template-columns:1fr} .gate{flex-direction:column;gap:2px} }
+
+/* ================= PRINT ================= */
+@media print{
+  :root{
+    --ink:#171a21; --ink2:#454b59; --ink3:#6c7386;
+    --paper:#ffffff; --surface:#ffffff; --surface2:#f4f5f8;
+    --line:#d8dbe3; --lineStrong:#b7bbc8;
+    --brand:#4b3fd4; --brandSoft:#eeecff;
+    --creator:#c9421d; --creatorSoft:#ffefe9;
+    --ok:#15703f; --okSoft:#e6f5ec; --warn:#8a5a00; --warnSoft:#fdf3e0;
+    --gap:#a8261a; --gapSoft:#fdeeec; --code:#f5f6f9;
+    --sA:#4b3fd4; --sAs:#eeecff; --sB:#0f6f86; --sBs:#e4f3f7;
+    --sC:#8a5a00; --sCs:#fdf3e0; --sD:#6f2f9e; --sDs:#f5ebfb; --sE:#15703f; --sEs:#e6f5ec;
+    --d1:#4b3fd4; --d1s:#eeecff; --d2:#0f6f86; --d2s:#e4f3f7;
+    --d3:#8a5a00; --d3s:#fdf3e0; --d4:#6f2f9e; --d4s:#f5ebfb; --d5:#15703f; --d5s:#e6f5ec;
+    --shadow:none;
+  }
+  body{background:#fff;color:#171a21;padding-inline:0;padding-block:0;
+       -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  a{color:inherit;text-decoration:none}
+  .cp{display:none!important}
+  .tw{overflow:visible;border-radius:6px}
+  table{min-width:0!important;table-layout:auto;width:100%}
+  thead{display:table-header-group}
+  tr,.evd,.hop{break-inside:avoid}
+  .figbox{overflow:visible;border-radius:6px}
+  .figbox svg{min-width:0!important;width:100%;height:auto}
+  figure,.note,.card,.codeblk,.trace,.scorecard,.stats,.metaGrid,.lg,.tw{break-inside:avoid}
+  .flow,.wk{break-inside:avoid-page}
+  h2,h3,h4{break-after:avoid}
+  .part>header,.wk>header{break-after:avoid;break-inside:avoid}
+  .codeblk pre{white-space:pre-wrap;overflow-wrap:anywhere;border-radius:6px}
+  .grid2,.legend{break-inside:avoid}
+}
+
+@media print{
+  @page{size:A4 landscape;margin:11mm 12mm}
+  body{font-size:9pt;line-height:1.46}
+  .wrap{max-width:none}
+  .mast{padding-block:0 12px;break-after:page}
+  .mast h1{font-size:32pt}
+  section{padding-block:4px 4px}
+  section>h2{break-before:auto}
+  section>h2{font-size:18pt}
+  h3{font-size:12.5pt}
+  table{font-size:7.9pt}
+  th,td{padding:4px 7px}
+  .wk{box-shadow:none}
+  .wk + .wk{break-before:page}
+  .lanes{grid-template-columns:repeat(5,1fr)}
+  .lane{padding:9px 10px}
+  .lane ul{font-size:7.9pt;gap:5px}
+  .prose,ul.tight,section>.lede{max-width:none}
+  .footer{break-before:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">BrandBridge AI &middot; companion to the Build Manual</div>
+  <h1>Seven Weekends to BrandBridge</h1>
+  <p class="sub">A five-person delivery plan on a Friday&ndash;Sunday cadence. Every weekend has one theme, five parallel lanes, and a Sunday-evening gate that must pass before the next weekend starts.</p>
+  <div class="stats">
+    <div><div class="v">7</div><div class="k">weekends</div></div>
+    <div><div class="v">21</div><div class="k">working days</div></div>
+    <div><div class="v">5</div><div class="k">people</div></div>
+    <div><div class="v">~560</div><div class="k">person-hours</div></div>
+    <div><div class="v">25 Sep</div><div class="k">start</div></div>
+    <div><div class="v">8 Nov</div><div class="k">feature freeze</div></div>
+  </div>
+</header>
+
+<section>
+  <h2>How this plan works</h2>
+  <p class="lede">Three days a week is a real constraint, not a soft one. It means roughly sixteen focused hours per person per weekend, and it means anything left half-finished on Sunday sits untouched for four days and costs an hour of re-reading to resume. The plan is built around that.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>The weekend shape</h4>
+      <p><b>Friday evening</b> (~3 h) &mdash; pull main, 20-minute stand-up, pick up the smallest independent task. No new architecture on a Friday.<br>
+      <b>Saturday</b> (~7 h) &mdash; the deep work block. This is where the weekend's real output happens.<br>
+      <b>Sunday</b> (~6 h) &mdash; finish, integrate, review each other's PRs, run the gate, write the log entry.</p>
+    </div>
+    <div class="card">
+      <h4>Two hard rules</h4>
+      <p><b>Nothing is carried across a week boundary.</b> If a task cannot finish by Sunday evening, split it on Friday so that some reviewable part can. Half-done work that waits four days is the main way three-day weeks fail.<br>
+      <b>Sunday 18:00 is merge-freeze.</b> Everything reviewable merges by then. The last hour is the gate, the demo check and the contribution log.</p>
+    </div>
+    <div class="card">
+      <h4>The gate</h4>
+      <p>Each weekend ends with a check that is demonstrable, not a feeling. Run it together in fifteen minutes. If it fails, the next weekend opens by fixing it &mdash; the plan bends, the gate does not. A failed gate carried silently into week 5 is how a capstone runs out of runway.</p>
+    </div>
+    <div class="card">
+      <h4>The contribution log</h4>
+      <p>Each person adds three lines to <code>docs/contributions/&lt;name&gt;.md</code> every Sunday: what I built, what I decided, what I learned. Fifteen minutes a week, and it becomes the individual viva prep and the report's methods section. Reconstructing it in December from git history is far more work and far less convincing.</p>
+    </div>
+  </div>
+
+  <h3>Who does what</h3>
+  <p class="prose">Five lanes with clean interfaces, so nobody is blocked waiting on a teammate's merge. The name mapping below is inferred from the repository's own commit history &mdash; confirm or swap it in weekend&nbsp;1, then record it in the README.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Lane</th><th>Provisional</th><th>Evidence from the repo</th><th>Owns</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip sA">A · Platform</span></td><td>Harshit</td><td>Repo owner; authored the architecture guide and the transformed-creator contract</td><td>Auth, migrations, schema, repositories, campaign &amp; profile services, error shape, CI</td></tr>
+      <tr><td><span class="chip sB">B · Frontend</span></td><td>Lakshmi</td><td>&mdash; assign in W1</td><td>Every screen, the component kit, auth context, role switching, UX acceptance</td></tr>
+      <tr><td><span class="chip sC">C · ML</span></td><td>Mohit</td><td>Authored the creator data strategy and the sub-problem analysis</td><td>Feature builder, model ladder E1&ndash;E6, reciprocal scoring, re-ranking, metrics</td></tr>
+      <tr><td><span class="chip sD">D · GenAI</span></td><td>Mayank</td><td>Bluesky integration branch</td><td>LLM adapter, brief parser, embeddings, RAG, explanations, LangGraph, label rubric</td></tr>
+      <tr><td><span class="chip sE">E · Integrations</span></td><td>Manjusha</td><td>YouTube collector branch with P0 feature work</td><td>Three adapters, OAuth, sync, seed data, integration tests, demo script, deployment</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">
+    <span class="t">On the non-engineering half of the work</span>
+    <p>Dataset labelling, campaign and persona design, creator outreach for the consented gold set, test scenarios, evaluation rubrics, the experiment log and the final report are substantive capstone contributions, not overhead. They are scheduled into the lanes below as named tasks with hours, because work that is not on the plan does not happen on a three-day week.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The seven weekends at a glance</h2>
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 980 372" role="img" aria-label="Swimlane schedule: five workstreams across seven weekends with milestones">
+        <!-- header -->
+        <text class="s-h" x="0" y="20">LANE</text>
+        <g>
+          <text class="s-h" x="146" y="20">W1</text><text class="s-s" x="146" y="33">25–27 Sep</text>
+          <text class="s-h" x="264" y="20">W2</text><text class="s-s" x="264" y="33">2–4 Oct</text>
+          <text class="s-h" x="382" y="20">W3</text><text class="s-s" x="382" y="33">9–11 Oct</text>
+          <text class="s-h" x="500" y="20">W4</text><text class="s-s" x="500" y="33">16–18 Oct</text>
+          <text class="s-h" x="618" y="20">W5</text><text class="s-s" x="618" y="33">23–25 Oct</text>
+          <text class="s-h" x="736" y="20">W6</text><text class="s-s" x="736" y="33">30 Oct–1 Nov</text>
+          <text class="s-h" x="854" y="20">W7</text><text class="s-s" x="854" y="33">6–8 Nov</text>
+        </g>
+        <line x1="0" y1="42" x2="980" y2="42" stroke="var(--lineStrong)" stroke-width="1.2"/>
+        <g stroke="var(--line)" stroke-width="1">
+          <line x1="140" y1="42" x2="140" y2="330"/><line x1="258" y1="42" x2="258" y2="330"/>
+          <line x1="376" y1="42" x2="376" y2="330"/><line x1="494" y1="42" x2="494" y2="330"/>
+          <line x1="612" y1="42" x2="612" y2="330"/><line x1="730" y1="42" x2="730" y2="330"/>
+          <line x1="848" y1="42" x2="848" y2="330"/>
+        </g>
+
+        <!-- Lane A -->
+        <text class="s-l" x="0" y="72" fill="var(--sA)">A · Platform</text>
+        <text class="s-s" x="0" y="85">Harshit</text>
+        <g fill="var(--sAs)" stroke="var(--sA)" stroke-width="1">
+          <rect x="146" y="56" width="106" height="36" rx="5"/>
+          <rect x="264" y="56" width="106" height="36" rx="5"/>
+          <rect x="382" y="56" width="106" height="36" rx="5"/>
+          <rect x="500" y="56" width="106" height="36" rx="5"/>
+          <rect x="618" y="56" width="106" height="36" rx="5"/>
+          <rect x="736" y="56" width="106" height="36" rx="5"/>
+          <rect x="854" y="56" width="106" height="36" rx="5"/>
+        </g>
+        <g class="s-l" text-anchor="middle" font-size="9">
+          <text x="199" y="71">auth · 0002</text><text x="199" y="83">deps · errors</text>
+          <text x="317" y="71">profiles · rates</text><text x="317" y="83">campaigns 0003–5</text>
+          <text x="435" y="71">eligibility</text><text x="435" y="83">retrieval 0006–7</text>
+          <text x="553" y="71">proposals</text><text x="553" y="83">collab 0008</text>
+          <text x="671" y="71">docs API</text><text x="671" y="83">perf · N+1</text>
+          <text x="789" y="71">agreements</text><text x="789" y="83">hardening</text>
+          <text x="907" y="71">freeze</text><text x="907" y="83">bug triage</text>
+        </g>
+
+        <!-- Lane B -->
+        <text class="s-l" x="0" y="130" fill="var(--sB)">B · Frontend</text>
+        <text class="s-s" x="0" y="143">Lakshmi</text>
+        <g fill="var(--sBs)" stroke="var(--sB)" stroke-width="1">
+          <rect x="146" y="114" width="106" height="36" rx="5"/>
+          <rect x="264" y="114" width="106" height="36" rx="5"/>
+          <rect x="382" y="114" width="106" height="36" rx="5"/>
+          <rect x="500" y="114" width="106" height="36" rx="5"/>
+          <rect x="618" y="114" width="106" height="36" rx="5"/>
+          <rect x="736" y="114" width="106" height="36" rx="5"/>
+          <rect x="854" y="114" width="106" height="36" rx="5"/>
+        </g>
+        <g class="s-l" text-anchor="middle" font-size="9">
+          <text x="199" y="129">shell · auth</text><text x="199" y="141">components · MSW</text>
+          <text x="317" y="129">creator wizard</text><text x="317" y="141">rate card · prefs</text>
+          <text x="435" y="129">campaign studio</text><text x="435" y="141">discover grid</text>
+          <text x="553" y="129">opportunity feed</text><text x="553" y="141">proposals inbox</text>
+          <text x="671" y="129">why-panel</text><text x="671" y="141">confirm screen</text>
+          <text x="789" y="129">collab kanban</text><text x="789" y="141">states · polish</text>
+          <text x="907" y="129">demo walkthrough</text><text x="907" y="141">a11y pass</text>
+        </g>
+
+        <!-- Lane C -->
+        <text class="s-l" x="0" y="188" fill="var(--sC)">C · ML</text>
+        <text class="s-s" x="0" y="201">Mohit</text>
+        <g fill="var(--sCs)" stroke="var(--sC)" stroke-width="1">
+          <rect x="146" y="172" width="106" height="36" rx="5"/>
+          <rect x="264" y="172" width="106" height="36" rx="5"/>
+          <rect x="382" y="172" width="106" height="36" rx="5"/>
+          <rect x="500" y="172" width="106" height="36" rx="5"/>
+          <rect x="618" y="172" width="106" height="36" rx="5"/>
+          <rect x="736" y="172" width="106" height="36" rx="5"/>
+          <rect x="854" y="172" width="106" height="36" rx="5"/>
+        </g>
+        <g class="s-l" text-anchor="middle" font-size="9">
+          <text x="199" y="187">label rubric</text><text x="199" y="199">feature spec</text>
+          <text x="317" y="187">feature builder</text><text x="317" y="199">E1 · E2</text>
+          <text x="435" y="187">E3 semantic</text><text x="435" y="199">eval harness</text>
+          <text x="553" y="187">S_creator</text><text x="553" y="199">reciprocal E5</text>
+          <text x="671" y="187">XGBoost E4</text><text x="671" y="199">held-out results</text>
+          <text x="789" y="187">E6 fairness</text><text x="789" y="199">cold start</text>
+          <text x="907" y="187">ablations</text><text x="907" y="199">final tables</text>
+        </g>
+
+        <!-- Lane D -->
+        <text class="s-l" x="0" y="246" fill="var(--sD)">D · GenAI</text>
+        <text class="s-s" x="0" y="259">Mayank</text>
+        <g fill="var(--sDs)" stroke="var(--sD)" stroke-width="1">
+          <rect x="146" y="230" width="106" height="36" rx="5"/>
+          <rect x="264" y="230" width="106" height="36" rx="5"/>
+          <rect x="382" y="230" width="106" height="36" rx="5"/>
+          <rect x="500" y="230" width="106" height="36" rx="5"/>
+          <rect x="618" y="230" width="106" height="36" rx="5"/>
+          <rect x="736" y="230" width="106" height="36" rx="5"/>
+          <rect x="854" y="230" width="106" height="36" rx="5"/>
+        </g>
+        <g class="s-l" text-anchor="middle" font-size="9">
+          <text x="199" y="245">160 briefs</text><text x="199" y="257">rubric · 50 labels</text>
+          <text x="317" y="245">encoder</text><text x="317" y="257">representations</text>
+          <text x="435" y="245">clusters</text><text x="435" y="257">200 more labels</text>
+          <text x="553" y="245">LLM adapter</text><text x="553" y="257">brief parser</text>
+          <text x="671" y="245">explanations</text><text x="671" y="257">RAG ingest</text>
+          <text x="789" y="245">LangGraph</text><text x="789" y="257">proposal draft</text>
+          <text x="907" y="245">grounding eval</text><text x="907" y="257">report §AI</text>
+        </g>
+
+        <!-- Lane E -->
+        <text class="s-l" x="0" y="304" fill="var(--sE)">E · Integrations</text>
+        <text class="s-s" x="0" y="317">Manjusha</text>
+        <g fill="var(--sEs)" stroke="var(--sE)" stroke-width="1">
+          <rect x="146" y="288" width="106" height="36" rx="5"/>
+          <rect x="264" y="288" width="106" height="36" rx="5"/>
+          <rect x="382" y="288" width="106" height="36" rx="5"/>
+          <rect x="500" y="288" width="106" height="36" rx="5"/>
+          <rect x="618" y="288" width="106" height="36" rx="5"/>
+          <rect x="736" y="288" width="106" height="36" rx="5"/>
+          <rect x="854" y="288" width="106" height="36" rx="5"/>
+        </g>
+        <g class="s-l" text-anchor="middle" font-size="9">
+          <text x="199" y="303">shrink data/raw</text><text x="199" y="315">adapter contract</text>
+          <text x="317" y="303">seed 200 real</text><text x="317" y="315">creators · 20 campaigns</text>
+          <text x="435" y="303">YT + IG OAuth</text><text x="435" y="315">sync · snapshots</text>
+          <text x="553" y="303">gold set outreach</text><text x="553" y="315">integration tests</text>
+          <text x="671" y="303">docs upload</text><text x="671" y="315">e2e suite</text>
+          <text x="789" y="303">docker smoke</text><text x="789" y="315">cloud deploy</text>
+          <text x="907" y="303">demo dataset</text><text x="907" y="315">offline mode</text>
+        </g>
+
+        <!-- milestones -->
+        <line x1="0" y1="336" x2="980" y2="336" stroke="var(--lineStrong)" stroke-width="1.2"/>
+        <g>
+          <circle cx="317" cy="352" r="4.5" fill="var(--gap)"/>
+          <text class="s-s" x="272" y="368" fill="var(--gap)">MID-SEM · Sat 3 Oct</text>
+          <circle cx="553" cy="352" r="4.5" fill="var(--brand)"/>
+          <text class="s-s" x="504" y="368" fill="var(--brand)">both directions live</text>
+          <circle cx="671" cy="352" r="4.5" fill="var(--brand)"/>
+          <text class="s-s" x="636" y="368" fill="var(--brand)">E5 result</text>
+          <circle cx="907" cy="352" r="4.5" fill="var(--ok)"/>
+          <text class="s-s" x="864" y="368" fill="var(--ok)">FEATURE FREEZE</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The critical path runs A&nbsp;&rarr;&nbsp;E&nbsp;&rarr;&nbsp;C: nothing can be ranked until the schema exists and the seed data is loaded. That is why weekend&nbsp;2 ends with 150 seeded creators and not with a nicer campaign form.</figcaption>
+  </figure>
+
+  <div class="note g">
+    <span class="t">The mid-semester review lands inside weekend 2</span>
+    <p>Saturday 3 October is a working day in this plan and a review checkpoint. Do not build a separate demo for it &mdash; present weekend 2's actual state: the problem, the architecture, a working auth and profile flow, the seeded dataset, and the experiment design. A real half-built system with a defensible plan reviews better than a polished mock with nothing behind it. Budget three hours on Friday 2 October for the deck; do not let it eat Saturday.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Weekend by weekend</h2>
+
+  <!-- W1 -->
+  <article class="wk">
+    <header><span class="no">01</span><span class="ttl">Foundations and the identity decision</span><span class="dates">FRI 25 &ndash; SUN 27 SEP</span></header>
+    <div class="wkgoal"><b>Goal:</b> a running stack where one account can hold both a brand and a creator role, switch between them, and be refused the other mode's endpoints. Plus the dataset work that has a four-week lead time started on day one.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Close the three open decisions from Part 1 of the manual &mdash; 45 min, Friday, whole team</li>
+        <li>Migration <code>0002</code>: <code>user_roles</code>, backfill, drop <code>users.role</code></li>
+        <li>JWT issue/verify beside the existing PBKDF2 hashing &mdash; keep the hashing</li>
+        <li><code>api/deps.py</code>: <code>get_current_user</code>, <code>get_active_role</code>, <code>require_role</code></li>
+        <li>Replace the auth placeholder: register, login, refresh, <code>/me</code>, <code>/me/roles</code></li>
+        <li><code>core/errors.py</code> + the common error-shape handler</li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li>Tailwind, theme tokens, the two-mode shell from wireframe 04</li>
+        <li>zustand auth store; typed client with POST/PATCH and an auth header</li>
+        <li>Register and login screens matching wireframe 03, including &ldquo;both&rdquo;</li>
+        <li><code>&lt;RoleSwitcher&gt;</code>, <code>&lt;StatusPill&gt;</code>, <code>&lt;ScoreBar&gt;</code>, <code>&lt;EmptyState&gt;</code></li>
+        <li>MSW mock layer &mdash; from here on, B is never blocked by A</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li>Label rubric v1: the 0&ndash;3 scale, both sides, five worked examples</li>
+        <li>Freeze the feature list with C and A; publish it as <code>docs/ml/features-v1.md</code></li>
+        <li>Notebook: profile the committed <code>data/raw/</code> &mdash; how many creators, which fields are actually populated, what is missing</li>
+        <li>Write <code>compute_completeness</code> and its unit tests &mdash; a small pure function A needs in W2</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li>Write 40 campaign briefs in real brand language &mdash; this is the long pole, start now</li>
+        <li>Draft the <code>CampaignRequirementsDraft</code> Pydantic schema with C and A</li>
+        <li>Label the first 50 pairs with C to stress-test the rubric before scaling it</li>
+        <li>Select and pin the encoder; benchmark load and encode time locally</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li><b>Shrink <code>data/raw/</code> from 509&nbsp;MB to under 40&nbsp;MB</b> &mdash; drop the <code>raw</code> payloads, de-duplicate embedded content, gitignore timestamped runs, then <code>git filter-repo</code>. Do this before anyone else clones again.</li>
+        <li><code>integrations/base.py</code>: the <code>SocialAdapter</code> protocol and the normalised contract</li>
+        <li>Refactor the Bluesky collector behind it first &mdash; no key, no app review, fastest proof</li>
+        <li>Move <code>instagram_data.json</code> into <code>data/raw/instagram/</code> and confirm no token was committed</li>
+        <li>Add <code>alembic upgrade head</code> to CI against a throwaway Postgres service</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Register one account with both roles &rarr; log in &rarr; switch to brand mode &rarr; call a creator-only endpoint &rarr; receive 403 with the common error shape. <code>docker compose up --build</code> works from a clean clone on two different laptops. CI is green including the migration step.</span></div>
+  </article>
+
+  <!-- W2 -->
+  <article class="wk">
+    <header><span class="no">02</span><span class="ttl">Profiles, campaigns and 150 seeded creators</span><span class="dates">FRI 2 &ndash; SUN 4 OCT</span><span class="chip cGap">mid-sem Sat</span></header>
+    <div class="wkgoal"><b>Goal:</b> the marketplace has data in it. A creator can be created with a rate card and preferences; a brand can create and publish a campaign through a plain form; and 150 seeded creators are in the database so lane C can start on real rows.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Migrations <code>0003</code> creator commercial, <code>0004</code> social evidence, <code>0005</code> campaign requirements</li>
+        <li>Creator profile CRUD end to end &mdash; flow F2 in the manual, the reference implementation</li>
+        <li>Rate card and preferences: replace-as-a-set and upsert &mdash; F3</li>
+        <li>Brand profile CRUD; campaign create, confirm-requirements, publish &mdash; <b>no LLM yet</b></li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li>Creator profile wizard, three steps, against the real API</li>
+        <li><code>&lt;RateCardTable&gt;</code> editor and the preferences screen with lock icons on hard fields</li>
+        <li>Brand profile form; campaign studio steps 1 and 3</li>
+        <li>Loading, empty and error states on every list built so far</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li><code>ml/features/builder.py</code> with <code>FEATURE_VERSION</code> and unit tests against fixtures</li>
+        <li>E1 popularity and E2 rule-based baselines in a notebook over the seeded data</li>
+        <li>Train/test split strategy: campaign-holdout, with the near-duplicate check written</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li><code>ai/embeddings/encoder.py</code> as a cached singleton</li>
+        <li>Representation builder &mdash; F5 &mdash; running offline over the seed data</li>
+        <li>Briefs 41&ndash;100; keep the 40 unseen-vertical briefs sealed</li>
+        <li><b>Mid-sem deck</b>, Friday evening: problem, architecture, live auth + profile, dataset, experiment design</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li><b><code>scripts/seed_data.py</code> &mdash; the week's most important deliverable.</b> Load the <b>200 real creators already in <code>data/raw/</code></b> (100 YouTube, 100 Bluesky) and attach clearly-labelled <code>SYNTHETIC</code> rates, preferences and audience fields &mdash; the only parts the collectors cannot observe</li>
+        <li>20 seeded campaigns across four verticals</li>
+        <li>YouTube adapter refactored behind the contract; public-lookup path working with an API key only</li>
+        <li>Integration test: seed &rarr; query &rarr; assert counts and provenance flags</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">A fresh database seeded with 200 real creators and 20 campaigns in one command. A creator profile with a rate card created through the UI. A campaign created, confirmed and published through the UI. Every seeded row carries a <code>data_provenance</code> value and synthetic fields are distinguishable from real ones. A clean clone is under 60&nbsp;MB.</span></div>
+  </article>
+
+  <!-- W3 -->
+  <article class="wk">
+    <header><span class="no">03</span><span class="ttl">Eligibility, retrieval and the first ranked list</span><span class="dates">FRI 9 &ndash; SUN 11 OCT</span></header>
+    <div class="wkgoal"><b>Goal:</b> a brand clicks Generate and gets a ranked list of real creators with stored score components and stored exclusion reasons. It uses a rule-based score, and that is fine &mdash; the endpoint shape will not change when the model arrives.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Migrations <code>0006</code> vectors + HNSW, <code>0007</code> matching and labels</li>
+        <li><code>services/eligibility.py</code>: rules R1&ndash;R8 with exclusion rows and a rule version</li>
+        <li><code>services/discovery.py</code>: the six-stage pipeline wired with C's functions</li>
+        <li><code>POST /recommendations/generate</code>, <code>GET /recommendations</code>, <code>GET /exclusions</code></li>
+        <li><b>Bulk-load the candidate bundles</b> &mdash; one query per table. Watch for the N+1 here.</li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li>Discover grid from wireframe 05 with <code>&lt;ScoreBar&gt;</code> and <code>&lt;MutualFitBadge&gt;</code></li>
+        <li><code>&lt;FreshnessStamp&gt;</code> on every provider number &mdash; review change 3</li>
+        <li>Exclusions audit view behind the &ldquo;eligible creators&rdquo; stat tile &mdash; review change 4</li>
+        <li>Campaign detail and the campaign list for both modes</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li>E3 semantic-only ranking over the real representations</li>
+        <li><code>ml/evaluation/metrics.py</code>: P@K, R@K, NDCG@K, MAP with tests against hand-computed values</li>
+        <li>First comparison table E1 vs. E2 vs. E3 on the labelled subset</li>
+        <li>The rule-based scorer A calls this weekend, behind the same interface the model will use</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li>Content clustering &rarr; <code>creator_content_clusters</code> with shares</li>
+        <li>Representation rebuild as a background task with atomic version swap</li>
+        <li>Labels 51&ndash;250 with C &mdash; two raters per pair, disagreements logged</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li>YouTube OAuth round trip through FastAPI, token encrypted at rest</li>
+        <li>Sync writes <code>social_accounts</code> + <code>social_metric_snapshots</code> + content items</li>
+        <li>Instagram Graph POC: confirm <code>/me/accounts</code> returns the Page and linked IG account before writing production code</li>
+        <li>Sponsored-vs-organic caption classifier with stored evidence spans</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Generate recommendations for a seeded campaign in under two seconds. Ten creators returned, 75 <code>match_scores</code> rows persisted with components and versions, and every excluded creator has a row naming the rule that excluded them. Toggle one campaign requirement and watch the eligible count change in a way you can explain.</span></div>
+  </article>
+
+  <!-- W4 -->
+  <article class="wk">
+    <header><span class="no">04</span><span class="ttl">The second direction and the reciprocal score</span><span class="dates">FRI 16 &ndash; SUN 18 OCT</span><span class="chip cPlain">milestone</span></header>
+    <div class="wkgoal"><b>Goal:</b> the product becomes genuinely two-sided. A creator sees ranked campaigns chosen by <em>their</em> interests, both sides can initiate a proposal, and a counter-offer can be accepted into a collaboration.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Migration <code>0008</code>: <code>initiated_by</code>, versions, collaborations, agreements, messages, documents</li>
+        <li>Inverse eligibility &mdash; the same module, arguments swapped. One rule set, two call sites.</li>
+        <li><code>GET /creators/{id}/recommendations</code> + refresh &mdash; flow F8</li>
+        <li>Proposal state machine with the transition map and the counterparty check &mdash; F10</li>
+        <li>Accept in one transaction &rarr; <code>collaborations</code></li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li><b>Opportunity feed</b> &mdash; the creator-side surface that does not exist in the wireframes</li>
+        <li>Campaign detail, creator's view: pay vs. own rate card, deliverables, deadline, conflicts</li>
+        <li>Both proposal composers from wireframe 07, with the rate-card reference &mdash; review change 7</li>
+        <li>Proposal inbox/outbox with version history and the counter diff</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li><em>S<sub>c</sub></em> &mdash; the transparent creator-side utility, written to be readable by a creator</li>
+        <li><code>reciprocal()</code> with all four combination methods behind one flag</li>
+        <li><b>E5 first run</b>: does reciprocal ranking preserve brand relevance while improving mutual suitability?</li>
+        <li>Mutual NDCG@5 and one-sided mismatch rate added to the harness</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li><code>ai/llm/provider.py</code> and <code>structured.py</code> with schema-constrained output and one repair retry</li>
+        <li>Brief parser v1 + <code>POST /parse-brief</code>; per-field confidence in the response</li>
+        <li>Extraction test set over the 120 core briefs; per-field F1 reported</li>
+        <li>Labels 251&ndash;400; compute Cohen's &kappa; per side</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li>Instagram adapter to whatever depth Meta permissions allow; cached fallback either way</li>
+        <li>Gold-set outreach: contact 30&ndash;50 creators for real rates and preferences &mdash; start now, replies are slow</li>
+        <li>Integration tests for both discovery directions on the seeded database</li>
+        <li>Grow the seed set toward 300 creators</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">The convergence demo: a brand finds a creator, and that same creator independently finds that same campaign in their own feed. One proposal, one counter, one accept, one collaboration row. <code>match_scores</code> holds rows in both directions for the pair. This is the moment the project stops being a search tool.</span></div>
+  </article>
+
+  <!-- W5 -->
+  <article class="wk">
+    <header><span class="no">05</span><span class="ttl">The trained model, explanations and RAG</span><span class="dates">FRI 23 &ndash; SUN 25 OCT</span><span class="chip cPlain">result</span></header>
+    <div class="wkgoal"><b>Goal:</b> the headline experimental result exists on held-out data, and the AI layer becomes visible in the product: grounded explanations and document-grounded Q&amp;A.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Document upload with background ingest; <code>POST /knowledge/query</code></li>
+        <li>Migration <code>0009</code> + the Wall endpoints (F13), including the import-isolation test that keeps wall data out of ranking</li>
+        <li>Model loading from <code>model_versions</code> with <code>is_active</code> &mdash; swap models without a deploy</li>
+        <li>Performance pass: kill remaining N+1s, add the missing indexes, measure p95 per endpoint</li>
+        <li><code>ai_execution_logs</code> written on every AI call</li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li><b>Confirm-requirements screen</b> with <code>&lt;ConfidenceField&gt;</code> &mdash; review change 6, the missing step 2</li>
+        <li><b>&ldquo;Why this match?&rdquo; panel</b>: prose above, evidence chips and component bars below</li>
+        <li>Document upload and the policy Q&amp;A screen with <code>&lt;SourceExcerpt&gt;</code></li>
+        <li>Replace the single mutual-fit percentage with two numbers and a band &mdash; review change 2</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li>Train LR, RF and XGBoost; register each in <code>model_versions</code> with its metrics</li>
+        <li><b>E4 vs. E5 on held-out data &mdash; the headline result</b></li>
+        <li>Error analysis: where does reciprocal ranking lose to one-sided, and why?</li>
+        <li>Objective-aware weights vs. fixed weights &mdash; report the difference honestly</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li>Explanation generator over the typed evidence payload &mdash; F9</li>
+        <li><b>The numeric validator</b>: every number in generated text must appear in the payload, or fall back</li>
+        <li>RAG ingest and retriever; the refusal path when similarity is too low</li>
+        <li>8&ndash;12 guideline documents + 30 questions with known answers; measure Recall@5 and groundedness</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li>End-to-end test suite covering both traces from Part 8 of the manual</li>
+        <li>Prompt-injection fixture: a PDF containing &ldquo;ignore previous instructions&rdquo;</li>
+        <li>Gold-set data arriving &rarr; loaded and flagged as real</li>
+        <li>Cloud deployment dry run</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">A results table comparing E1&ndash;E5 on the held-out set with real numbers. Zero hallucinated figures across 20 sampled explanations. A RAG answer that cites a page number, and a question it correctly refuses. Every AI call has a row in <code>ai_execution_logs</code> with its latency.</span></div>
+  </article>
+
+  <!-- W6 -->
+  <article class="wk">
+    <header><span class="no">06</span><span class="ttl">Fairness, orchestration and hardening</span><span class="dates">FRI 30 OCT &ndash; SUN 1 NOV</span></header>
+    <div class="wkgoal"><b>Goal:</b> the remaining research layers land, the Wall ships, the system survives its dependencies failing, and it runs somewhere other than a laptop. This is also the first weekend where cutting scope is the right answer.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Agreement draft and dual-approval endpoints</li>
+        <li>Collaboration status transitions and the kanban query</li>
+        <li><code>correlation_id</code> middleware end to end</li>
+        <li>Security pass: the token-never-in-a-response test, cross-tenant read tests</li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li>Collaboration kanban from wireframe 09</li>
+        <li>Agreement screen with clause-to-evidence expansion &mdash; review change 8</li>
+        <li><code>&lt;DegradedBanner&gt;</code> everywhere an adapter can degrade &mdash; review change 9</li>
+        <li><b>The Wall</b> &mdash; community feed and idea thread (F13), with the thread&rarr;proposal bridge</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li>MMR re-ranking with the relevance floor; <b>E6 with the relevance cost reported</b></li>
+        <li>Exposure share by follower band, coverage, Gini</li>
+        <li>Cold-start experiment: history features masked, new-creator subset</li>
+        <li>Fill <code>experiment_runs</code> for every variant &mdash; this becomes the report's results section</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li>LangGraph wrapping tools that already pass their own tests &mdash; F12</li>
+        <li>The human-approval interrupt with a checkpointer</li>
+        <li>Proposal draft endpoint from stored evidence</li>
+        <li><b>If the weekend is tight, ship deterministic orchestration and present the graph as designed.</b> Say so in the report; it defends well.</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li>Docker smoke test in CI; cloud deployment live</li>
+        <li><b>Offline demo mode</b>: every external call falls back to cached data behind one flag</li>
+        <li>Failure drills &mdash; pull the LLM key, pull the API key, confirm the demo still runs</li>
+        <li>Demo script written and rehearsed once, timed</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Run the full demo with the LLM key removed and the social API keys removed. Every flow still completes with deterministic fallbacks and visible degraded banners. Deployed URL reachable. E6 reported with its relevance trade-off, not just its diversity gain.</span></div>
+  </article>
+
+  <!-- W7 -->
+  <article class="wk">
+    <header><span class="no">07</span><span class="ttl">Freeze, evidence and the story</span><span class="dates">FRI 6 &ndash; SUN 8 NOV</span><span class="chip cOk">freeze</span></header>
+    <div class="wkgoal"><b>Goal:</b> nothing new is built. Everything that exists is proven, measured, written down and rehearsed. Friday 18:00 is feature freeze &mdash; after that, only bug fixes with a failing test attached.</div>
+    <div class="lanes">
+      <div class="lane a"><h4>A · Platform</h4><div class="who">Harshit</div><ul>
+        <li>Bug triage: fix, defer or document. Nothing stays silently broken.</li>
+        <li>Final OpenAPI export into <code>docs/api/</code></li>
+        <li>ADRs 011&ndash;014 written; README updated to describe what actually exists</li>
+        <li>Architecture section of the report</li>
+      </ul></div>
+      <div class="lane b"><h4>B · Frontend</h4><div class="who">Lakshmi</div><ul>
+        <li>Walk every screen against the demo script; fix only what the script touches</li>
+        <li>Keyboard and contrast pass; both themes checked</li>
+        <li>Screenshots for the report and the deck</li>
+        <li>One rehearsal recording as insurance against a live failure</li>
+      </ul></div>
+      <div class="lane c"><h4>C · ML</h4><div class="who">Mohit</div><ul>
+        <li><b>Open the held-out test set once.</b> Final numbers for E1&ndash;E6.</li>
+        <li>Remaining ablations if time allows: multi-vector representation, discovery mode</li>
+        <li>Results tables and charts, including negative and null results</li>
+        <li>Results and limitations sections of the report</li>
+      </ul></div>
+      <div class="lane d"><h4>D · GenAI</h4><div class="who">Mayank</div><ul>
+        <li>Final extraction, explanation and RAG evaluation on the 40 unseen briefs</li>
+        <li>Latency and cost table from <code>ai_execution_logs</code> &mdash; the &ldquo;in Practice&rdquo; evidence</li>
+        <li>&kappa; and the label-quality appendix</li>
+        <li>AI-methods section of the report</li>
+      </ul></div>
+      <div class="lane e"><h4>E · Integrations</h4><div class="who">Manjusha</div><ul>
+        <li>Frozen demo dataset; one command restores it</li>
+        <li>Final end-to-end run on the deployed instance</li>
+        <li>Two full team rehearsals, timed, with the failure path practised</li>
+        <li>Deck assembly; individual contribution logs collected</li>
+      </ul></div>
+    </div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">A clean clone, one command, working demo. Final results table with held-out numbers. Deck and report draft complete. Each member can explain their own contribution and one thing that did not work &mdash; that second answer is what the individual viva is actually testing.</span></div>
+  </article>
+</section>
+
+<section>
+  <h2>After the freeze</h2>
+  <p class="lede">The plan ends on 8 November with roughly four weeks before the final presentation. That gap is deliberate and it is the most valuable part of the schedule.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Period</th><th>Use it for</th><th>Do not use it for</th></tr></thead>
+    <tbody>
+      <tr><td><b>Buffer 1</b> · 13&ndash;15 Nov</td><td>Whatever slipped. Every project slips a weekend; this is the one you are allowed to slip into.</td><td>New features</td></tr>
+      <tr><td><b>Buffer 2</b> · 20&ndash;22 Nov</td><td>Report writing in full. Charts, tables, limitations, future work.</td><td>Re-running experiments to get a better number</td></tr>
+      <tr><td><b>Polish</b> · 27&ndash;29 Nov</td><td>Deck, rehearsals, individual viva prep from the contribution logs.</td><td>Touching the code</td></tr>
+      <tr><td><b>Final</b> · early Dec</td><td>Presentation, demo, individual viva.</td><td>&mdash;</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note o">
+    <span class="t">Why the freeze is a week early on purpose</span>
+    <p>A capstone is not marked on how much was built. It is marked on whether the claim is defensible, the evidence is real, and each person can explain their own decisions. Four quiet weeks of writing and rehearsal are worth more than one more feature &mdash; and a team that is still merging code in the last week will present a system nobody has time to understand.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Risks, with the actual response</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Risk</th><th>Early signal</th><th>Response</th><th>Owner</th></tr></thead>
+    <tbody>
+      <tr><td>Seed data slips past weekend 2</td><td>Lane C has nothing to profile on Sunday of W2</td><td><b>Stop other work.</b> This is the critical path &mdash; C, D and the whole experiment stall behind it. Two people on it. The 200 collected profiles make this far lower risk than the research documents assumed, so the failure mode now is the loader, not the data.</td><td>E</td></tr>
+      <tr><td>Meta app review blocks Instagram</td><td>No progress by mid-W4</td><td>Ship the POC, document the permission blocker, run on cached and seeded data. Bluesky and YouTube already prove the integration design.</td><td>E</td></tr>
+      <tr><td>Labelling falls behind 400 pairs</td><td>Fewer than 250 by the end of W4</td><td>Cut to 250 pairs across fewer campaigns rather than thinning coverage. Report the reduced N honestly. Do not generate synthetic labels and call them ground truth.</td><td>C + D</td></tr>
+      <tr><td>The reciprocal result is negative</td><td>E5 does not beat E4 in W5</td><td><b>This is a valid finding, not a failure.</b> Report it with error analysis and the conditions under which it does help. A well-analysed negative result marks better than a vague positive one.</td><td>C</td></tr>
+      <tr><td>The frontend becomes the bottleneck</td><td>Screens trailing endpoints by more than one weekend</td><td>Move D or E onto screens for a weekend. The component kit from W1 exists precisely so a second person can help without a ramp-up.</td><td>B</td></tr>
+      <tr><td>LangGraph consumes weekend 6</td><td>Not working by Saturday evening of W6</td><td>Cut it. Ship deterministic orchestration, present the graph as designed and scoped. This is a planned decision, not a failure.</td><td>D</td></tr>
+      <tr><td>Two people ill on the same weekend</td><td>&mdash;</td><td>The gate for that weekend moves; the freeze date does not. Buffer 1 absorbs it. Never compress weekend 7.</td><td>all</td></tr>
+      <tr><td>Scope creep into a real marketplace</td><td>Anyone proposes payments, chat, notifications or a social feed</td><td>Point at the non-goals list in the manual. The answer is &ldquo;future work&rdquo; and it is a good answer.</td><td>all</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Weekly rituals</h2>
+  <div class="grid2">
+    <div class="card"><h4>Friday, 20 minutes</h4><p>Everyone states one sentence: what I will have finished by Sunday evening. Not what I will work on. If a lane cannot name a finishable thing, split it there and then &mdash; that is the single highest-value twenty minutes of the week.</p></div>
+    <div class="card"><h4>Saturday, 10 minutes at midday</h4><p>Blockers only. No status. If someone is stuck on another lane's interface, the fix is a mock or a stub agreed in that ten minutes, never a wait until Sunday.</p></div>
+    <div class="card"><h4>Sunday 18:00, merge freeze</h4><p>Everything reviewable is merged. Reviews happen throughout Sunday, not in a queue at the end. A PR older than one weekend is a process failure.</p></div>
+    <div class="card"><h4>Sunday 19:00, the gate</h4><p>Run the gate check together, on one machine, out loud. Then each person writes three lines in their contribution log. Then stop &mdash; four days off is part of the plan, and it is what makes the next Friday productive.</p></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Seven Weekends to BrandBridge</b> &middot; companion to the BrandBridge Build Manual &middot; compiled 20 September 2026. Dates assume a Friday&ndash;Sunday cadence beginning 25 September 2026 and a feature freeze on 8 November, leaving four weeks of buffer, writing and rehearsal before the December presentation.</p>
+  <p style="margin-top:.6em">Lane-to-person mapping is inferred from the repository's commit history and is provisional &mdash; confirm it in weekend 1 and record it in the README.</p>
+</footer>
+</div>
+</body>
+</html>
