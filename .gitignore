@@ -22,17 +22,8 @@ frontend/coverage/
 # Data and model outputs
 backend/app/ml/artifacts/*
 !backend/app/ml/artifacts/README.md
-data/raw/*
-!data/raw/
-!data/raw/README.md
-data/raw/youtube/*
-!data/raw/youtube/
-!data/raw/youtube/README.md
-!data/raw/youtube/*.json
-data/raw/bsky/*
-!data/raw/bsky/
-!data/raw/bsky/README.md
-!data/raw/bsky/*.json
+
+# Processed data & heavy binary formats
 data/processed/
 *.parquet
 *.pkl
@@ -45,3 +36,8 @@ data/processed/
 
 # Docker
 *.log
+
+# Google OAuth credentials
+client_secret*.json
+token*.json
+*.pickle
