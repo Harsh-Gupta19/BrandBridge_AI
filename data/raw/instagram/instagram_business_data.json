@@ -1,0 +1,158 @@
+{
+  "source": "Instagram Graph API",
+  "api_setup": "Instagram Login",
+  "account_type": "BUSINESS",
+  "collector": "BrandBridge AI",
+  "collected_at": "2026-09-19T22:03:08.955494+00:00",
+  "token_validation": {
+    "id": "28627587253541998",
+    "username": "lapizziano"
+  },
+  "profile": {
+    "id": "28627587253541998",
+    "username": "lapizziano",
+    "name": "La Pizziano",
+    "biography": "Crafted with patience, baked with fire🔥.",
+    "website": null,
+    "profile_picture_url": "https://scontent-mia3-2.cdninstagram.com/v/t51.2885-19/474366246_581667027974864_5693768284745084181_n.jpg?stp=dst-jpg_s206x206_tt6&_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMyIn0%3D&_nc_ohc=U1m-SdjqKKEQ7kNvwHDNIL-&_nc_oc=Ado5ZDJgb_gh0LBZA03vQI_W0VRZbiYuz37T4Mu8hIBGmgl6DMYNdd_9W_91_CQ5POIZIOEjZcK-Jjt8c2HZh_pK&_nc_zt=24&_nc_ht=scontent-mia3-2.cdninstagram.com&edm=AP4hL3IEAAAA&_nc_tpa=Q5bMBQLQUlDEq1_ou3NYa5g_47kTgsG74jxOWQKV-D_Z6JPJ-ajQyCOZkblb3Hh4IO-2lk1BMfGXLeh-KA&oh=00_AQJsGclXErf1T8ODy5gvGR7t5OjZqQ5bXqUibBfov5rIbA&oe=6AB4F022",
+    "followers_count": 7,
+    "follows_count": 4,
+    "media_count": 0,
+    "account_type": "BUSINESS"
+  },
+  "profile_field_status": {
+    "id": {
+      "available": true,
+      "error": null
+    },
+    "username": {
+      "available": true,
+      "error": null
+    },
+    "name": {
+      "available": true,
+      "error": null
+    },
+    "biography": {
+      "available": true,
+      "error": null
+    },
+    "website": {
+      "available": false,
+      "error": "Field not returned"
+    },
+    "profile_picture_url": {
+      "available": true,
+      "error": null
+    },
+    "followers_count": {
+      "available": true,
+      "error": null
+    },
+    "follows_count": {
+      "available": true,
+      "error": null
+    },
+    "media_count": {
+      "available": true,
+      "error": null
+    },
+    "account_type": {
+      "available": true,
+      "error": null
+    }
+  },
+  "media": [],
+  "media_schema": {
+    "id": null,
+    "caption": null,
+    "media_type": null,
+    "media_product_type": null,
+    "media_url": null,
+    "thumbnail_url": null,
+    "permalink": null,
+    "timestamp": null,
+    "username": null,
+    "shortcode": null,
+    "like_count": null,
+    "comments_count": null,
+    "view_count": null,
+    "is_comment_enabled": null,
+    "is_shared_to_feed": null,
+    "alt_text": null
+  },
+  "media_field_status": {
+    "id": {
+      "available": true,
+      "error": null
+    },
+    "caption": {
+      "available": true,
+      "error": null
+    },
+    "media_type": {
+      "available": true,
+      "error": null
+    },
+    "media_product_type": {
+      "available": true,
+      "error": null
+    },
+    "media_url": {
+      "available": true,
+      "error": null
+    },
+    "thumbnail_url": {
+      "available": true,
+      "error": null
+    },
+    "permalink": {
+      "available": true,
+      "error": null
+    },
+    "timestamp": {
+      "available": true,
+      "error": null
+    },
+    "username": {
+      "available": true,
+      "error": null
+    },
+    "shortcode": {
+      "available": true,
+      "error": null
+    },
+    "like_count": {
+      "available": true,
+      "error": null
+    },
+    "comments_count": {
+      "available": true,
+      "error": null
+    },
+    "view_count": {
+      "available": true,
+      "error": null
+    },
+    "is_comment_enabled": {
+      "available": true,
+      "error": null
+    },
+    "is_shared_to_feed": {
+      "available": true,
+      "error": null
+    },
+    "alt_text": {
+      "available": true,
+      "error": null
+    }
+  },
+  "summary": {
+    "media_collected": 0,
+    "media_types": {},
+    "media_product_types": {},
+    "total_likes": 0,
+    "total_comments": 0,
+    "total_views": 0
+  }
+}
