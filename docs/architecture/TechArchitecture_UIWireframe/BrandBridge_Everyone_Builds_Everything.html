@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Everyone Builds Everything</title>
+<style>
+:root{
+  --ink:#171a21; --ink2:#454b59; --ink3:#6c7386;
+  --paper:#f7f7f6; --surface:#ffffff; --surface2:#f0f1f4;
+  --line:#dfe1e8; --lineStrong:#c2c6d3;
+  --brand:#4b3fd4; --brandSoft:#ecebff;
+  --ok:#15703f; --okSoft:#e3f4ea;
+  --warn:#8a5a00; --warnSoft:#fcf1dc;
+  --gap:#a8261a; --gapSoft:#fdeceb;
+  --d1:#4b3fd4; --d1s:#ecebff;
+  --d2:#0f6f86; --d2s:#e2f2f6;
+  --d3:#8a5a00; --d3s:#fcf1dc;
+  --d4:#6f2f9e; --d4s:#f4e9fb;
+  --d5:#15703f; --d5s:#e3f4ea;
+  --code:#f3f4f8;
+  --shadow:0 1px 2px rgba(20,24,34,.06),0 10px 26px -18px rgba(20,24,34,.26);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e7eaf1; --ink2:#b0b7c7; --ink3:#848da4;
+    --paper:#111319; --surface:#181b22; --surface2:#20242d;
+    --line:#2b303b; --lineStrong:#3d4453;
+    --brand:#9d95ff; --brandSoft:#241f45;
+    --ok:#5cd490; --okSoft:#132f1e;
+    --warn:#e0aa4e; --warnSoft:#31270f;
+    --gap:#ff857c; --gapSoft:#391a18;
+    --d1:#9d95ff; --d1s:#241f45;
+    --d2:#5cc5de; --d2s:#0e2c34;
+    --d3:#e0aa4e; --d3s:#31270f;
+    --d4:#c294ee; --d4s:#2c1b3a;
+    --d5:#5cd490; --d5s:#132f1e;
+    --code:#13161c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -20px rgba(0,0,0,.85);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e7eaf1; --ink2:#b0b7c7; --ink3:#848da4;
+  --paper:#111319; --surface:#181b22; --surface2:#20242d;
+  --line:#2b303b; --lineStrong:#3d4453;
+  --brand:#9d95ff; --brandSoft:#241f45;
+  --ok:#5cd490; --okSoft:#132f1e;
+  --warn:#e0aa4e; --warnSoft:#31270f;
+  --gap:#ff857c; --gapSoft:#391a18;
+  --d1:#9d95ff; --d1s:#241f45;
+  --d2:#5cc5de; --d2s:#0e2c34;
+  --d3:#e0aa4e; --d3s:#31270f;
+  --d4:#c294ee; --d4s:#2c1b3a;
+  --d5:#5cd490; --d5s:#132f1e;
+  --code:#13161c;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -20px rgba(0,0,0,.85);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:0}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0 0 .8em} p:last-child{margin-bottom:0}
+a{color:var(--brand)}
+code{font-family:var(--mono);font-size:.87em;background:var(--code);border:1px solid var(--line);border-radius:4px;padding:.06em .32em}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1180px;margin:0 auto}
+
+.mast{padding-block:40px 26px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);font-weight:600}
+.mast h1{font-family:var(--cond);font-size:clamp(34px,6.6vw,60px);font-weight:700;letter-spacing:-.015em;margin:.16em 0 .18em}
+.mast .sub{font-size:17px;color:var(--ink2);max-width:66ch}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:24px}
+.stats div{background:var(--surface);padding:12px 14px}
+.stats .v{font-family:var(--cond);font-size:27px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stats .k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-top:5px}
+
+section{padding-block:34px 4px}
+section>h2{font-family:var(--cond);font-size:clamp(24px,3.6vw,32px);font-weight:700;border-top:2px solid var(--ink);padding-top:14px;margin-bottom:8px}
+section>.lede{color:var(--ink2);max-width:74ch;margin-bottom:18px;font-size:15.5px}
+h3{font-family:var(--cond);font-size:21px;font-weight:600;margin:30px 0 10px}
+h4{font-size:15px;font-weight:600;margin:20px 0 6px}
+ul.tight,ol.tight{margin:0 0 1em;padding-left:1.15em;display:flex;flex-direction:column;gap:6px;max-width:78ch}
+ul.tight li::marker,ol.tight li::marker{color:var(--ink3)}
+.prose{max-width:78ch}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap}
+.k1{color:var(--d1);background:var(--d1s);border-color:color-mix(in srgb,var(--d1) 32%,transparent)}
+.k2{color:var(--d2);background:var(--d2s);border-color:color-mix(in srgb,var(--d2) 32%,transparent)}
+.k3{color:var(--d3);background:var(--d3s);border-color:color-mix(in srgb,var(--d3) 32%,transparent)}
+.k4{color:var(--d4);background:var(--d4s);border-color:color-mix(in srgb,var(--d4) 32%,transparent)}
+.k5{color:var(--d5);background:var(--d5s);border-color:color-mix(in srgb,var(--d5) 32%,transparent)}
+.kOk{color:var(--ok);background:var(--okSoft);border-color:color-mix(in srgb,var(--ok) 32%,transparent)}
+.kWarn{color:var(--warn);background:var(--warnSoft);border-color:color-mix(in srgb,var(--warn) 32%,transparent)}
+.kGap{color:var(--gap);background:var(--gapSoft);border-color:color-mix(in srgb,var(--gap) 32%,transparent)}
+.kPlain{color:var(--ink2);background:var(--surface2);border-color:var(--line)}
+
+.tw{overflow-x:auto;margin:14px 0 22px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:580px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--surface2);font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--lineStrong)}
+tbody tr:last-child td{border-bottom:none}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.ctr{text-align:center}
+
+figure{margin:18px 0 26px}
+.figbox{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:16px 14px;overflow-x:auto}
+.figbox svg{display:block;min-width:720px;width:100%;height:auto}
+figcaption{font-size:12.5px;color:var(--ink3);margin-top:9px;font-style:italic}
+.s-l{font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;fill:var(--ink)}
+.s-s{font-family:"IBM Plex Mono",monospace;font-size:8.5px;fill:var(--ink3);font-weight:500}
+.s-h{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:12px;font-weight:700;fill:var(--ink)}
+.s-n{font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;fill:var(--ink)}
+
+.wk{border:1px solid var(--line);border-radius:13px;background:var(--surface);margin:20px 0 26px;overflow:hidden;box-shadow:var(--shadow)}
+.wk>header{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;padding:15px 18px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.wk .no{font-family:var(--cond);font-size:26px;font-weight:700;color:var(--brand);line-height:1}
+.wk .ttl{font-family:var(--cond);font-size:21px;font-weight:700;flex:1 1 230px}
+.wk .dates{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.04em}
+.wkgoal{padding:13px 18px;border-bottom:1px solid var(--line);font-size:14.4px;background:color-mix(in srgb,var(--brandSoft) 45%,transparent)}
+.wk .tw{margin:0;border:none;border-radius:0}
+.wk table{min-width:640px}
+.wk thead th{border-top:none}
+.gate{padding:13px 18px;border-top:1px solid var(--line);background:var(--surface2);font-size:13.6px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.gate .t{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding-top:3px;min-width:104px}
+.gate .body{flex:1 1 320px}
+
+.note{border:1px solid var(--line);border-left:3px solid var(--brand);background:var(--surface);border-radius:0 9px 9px 0;padding:13px 16px;margin:16px 0;font-size:14.2px}
+.note.w{border-left-color:var(--warn)} .note.g{border-left-color:var(--gap)} .note.o{border-left-color:var(--ok)}
+.note .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(262px,1fr));gap:14px;margin:14px 0 22px}
+.card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px 16px}
+.card h4{margin:0 0 6px;font-size:15px}
+.lvl{display:inline-block;width:19px;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;border-radius:4px;padding:1px 0}
+.l0{color:var(--ink3);background:var(--surface2)}
+.l2{color:var(--warn);background:var(--warnSoft)}
+.l3{color:var(--brand);background:var(--brandSoft)}
+.l4{color:var(--ok);background:var(--okSoft)}
+.footer{border-top:2px solid var(--ink);padding-block:22px 46px;font-size:13px;color:var(--ink3);margin-top:22px}
+@media (max-width:560px){ .gate{flex-direction:column;gap:2px} }
+
+/* ================= PRINT ================= */
+@media print{
+  :root{
+    --ink:#171a21; --ink2:#454b59; --ink3:#6c7386;
+    --paper:#ffffff; --surface:#ffffff; --surface2:#f4f5f8;
+    --line:#d8dbe3; --lineStrong:#b7bbc8;
+    --brand:#4b3fd4; --brandSoft:#eeecff;
+    --creator:#c9421d; --creatorSoft:#ffefe9;
+    --ok:#15703f; --okSoft:#e6f5ec; --warn:#8a5a00; --warnSoft:#fdf3e0;
+    --gap:#a8261a; --gapSoft:#fdeeec; --code:#f5f6f9;
+    --sA:#4b3fd4; --sAs:#eeecff; --sB:#0f6f86; --sBs:#e4f3f7;
+    --sC:#8a5a00; --sCs:#fdf3e0; --sD:#6f2f9e; --sDs:#f5ebfb; --sE:#15703f; --sEs:#e6f5ec;
+    --d1:#4b3fd4; --d1s:#eeecff; --d2:#0f6f86; --d2s:#e4f3f7;
+    --d3:#8a5a00; --d3s:#fdf3e0; --d4:#6f2f9e; --d4s:#f5ebfb; --d5:#15703f; --d5s:#e6f5ec;
+    --shadow:none;
+  }
+  body{background:#fff;color:#171a21;padding-inline:0;padding-block:0;
+       -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  a{color:inherit;text-decoration:none}
+  .cp{display:none!important}
+  .tw{overflow:visible;border-radius:6px}
+  table{min-width:0!important;table-layout:auto;width:100%}
+  thead{display:table-header-group}
+  tr,.evd,.hop{break-inside:avoid}
+  .figbox{overflow:visible;border-radius:6px}
+  .figbox svg{min-width:0!important;width:100%;height:auto}
+  figure,.note,.card,.codeblk,.trace,.scorecard,.stats,.metaGrid,.lg,.tw{break-inside:avoid}
+  .flow,.wk{break-inside:avoid-page}
+  h2,h3,h4{break-after:avoid}
+  .part>header,.wk>header{break-after:avoid;break-inside:avoid}
+  .codeblk pre{white-space:pre-wrap;overflow-wrap:anywhere;border-radius:6px}
+  .grid2,.legend{break-inside:avoid}
+}
+
+@media print{
+  @page{size:A4 landscape;margin:11mm 12mm}
+  body{font-size:9pt;line-height:1.46}
+  .wrap{max-width:none}
+  .mast{padding-block:0 12px;break-after:page}
+  .mast h1{font-size:32pt}
+  section{padding-block:4px 4px}
+  section>h2{break-before:auto}
+  section>h2{font-size:18pt}
+  h3{font-size:12.5pt}
+  table{font-size:7.9pt}
+  th,td{padding:4px 7px}
+  .wk{box-shadow:none}
+  .wk + .wk{break-before:page}
+  .wk table{font-size:7.7pt}
+  .prose,ul.tight,ol.tight,section>.lede{max-width:none}
+  .footer{break-before:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">BrandBridge AI &middot; staffing model for the seven-weekend plan</div>
+  <h1>Everyone Builds Everything</h1>
+  <p class="sub">A rotation design that puts all five engineers through all five technical domains inside the same 25&nbsp;September&ndash;8&nbsp;November window &mdash; without the project losing the continuity it needs to ship.</p>
+  <div class="stats">
+    <div><div class="v">5</div><div class="k">domains each</div></div>
+    <div><div class="v">4</div><div class="k">rotation rounds</div></div>
+    <div><div class="v">20</div><div class="k">handovers</div></div>
+    <div><div class="v">44%</div><div class="k">time outside home</div></div>
+    <div><div class="v">~11%</div><div class="k">throughput cost</div></div>
+    <div><div class="v">60 h</div><div class="k">scope you cut</div></div>
+  </div>
+</header>
+
+<section>
+  <h2>The problem with just rotating people</h2>
+  <p class="lede">Cross-training is the right ambition. It is also the thing most likely to sink a 21-day project, and it fails in two specific ways that are worth naming before designing around them.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Failure one &mdash; nobody owns the shape</h4>
+      <p>If authorship rotates and nothing else does, every domain drifts. The schema grows three naming conventions. The feature builder gets a fourth signature. Nobody notices that a rule was duplicated, because the person who wrote it in week 3 was somewhere else in week 5. By week 6 the integration cost exceeds the remaining capacity.</p>
+    </div>
+    <div class="card">
+      <h4>Failure two &mdash; the viva gets worse, not better</h4>
+      <p>The individual viva asks two questions: <em>explain this system</em> and <em>what did you build and why</em>. Broad rotation improves the first answer and can destroy the second. Five people who each touched everything shallowly and decided nothing is a worse outcome than five specialists, and examiners notice it immediately.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="t">The design response</span>
+    <p>Separate the two things that lane ownership bundles together. <b>Stewardship</b> &mdash; accountability for a domain's integrity across all seven weekends &mdash; does <em>not</em> rotate. <b>Authorship</b> &mdash; who actually writes the code this weekend &mdash; does. Everyone keeps one domain they can defend in depth, and everyone still builds in all five.</p>
+  </div>
+
+  <h3>Three mechanisms, in order of importance</h3>
+  <ol class="tight">
+    <li><b>Vertical slices instead of horizontal tasks.</b> The single biggest cross-training lever, and it costs nothing. Assign <em>&ldquo;creator rate card, end to end&rdquo;</em> &mdash; migration, model, repository, service, endpoint, screen, test &mdash; rather than <em>&ldquo;build the rate card API&rdquo;</em>. One person walks the whole stack for one feature. A slice is finishable inside one weekend, which is exactly what a three-day cadence needs.</li>
+    <li><b>Pair-and-swap on Saturdays.</b> Each weekend every person spends their deepest block in a domain they do not steward, with the steward pairing for the first two hours and reviewing on Sunday. Four rounds put everyone through all four other domains.</li>
+    <li><b>Teaching artifacts.</b> Every visit ends with ten lines in <code>docs/domains/&lt;domain&gt;/field-notes.md</code>: what I built, what surprised me, where the traps are. This is how knowledge outlives the rotation &mdash; and it is also, almost for free, the individual contribution log the viva needs.</li>
+  </ol>
+
+  <div class="note o">
+    <span class="t">Why the layer contract makes this safe</span>
+    <p>Rotation only works if a newcomer cannot break something they do not understand. The layer contract in Part&nbsp;3 of the Build Manual is what provides that: routers cannot query, services cannot write SQL, ML modules cannot see a <code>Session</code>. A visitor writing their first endpoint in an unfamiliar domain is boxed in by the architecture rather than by their own caution. <b>Enforce the contract strictly from weekend 1 and rotation becomes cheap; let it slide and rotation becomes dangerous.</b></p>
+  </div>
+</section>
+
+<section>
+  <h2>The five domains and their stewards</h2>
+  <p class="lede">Stewardship is fixed for all seven weekends. A steward decides; a visitor implements. That one rule is what keeps five pairs of hands from producing five architectures.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Domain</th><th>Steward</th><th>Covers</th><th>Steward's standing job</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip k1">D1 Platform</span></td><td>Harshit</td><td>Migrations, auth, deps, schemas, services, repositories, error shape</td><td>Owns the schema and the layer contract. No migration merges without their review.</td></tr>
+      <tr><td><span class="chip k2">D2 Interface</span></td><td>Lakshmi</td><td>React, component kit, screens, routing, role switching, states</td><td>Owns the component kit. Rejects one-off CSS that should have been a component.</td></tr>
+      <tr><td><span class="chip k3">D3 Modelling</span></td><td>Mohit</td><td>Feature builder, model ladder, reciprocal scoring, re-ranking, metrics</td><td>Owns <code>FEATURE_VERSION</code> and the experiment log. Guards against leakage.</td></tr>
+      <tr><td><span class="chip k4">D4 Language</span></td><td>Mayank</td><td>LLM adapter, brief parsing, embeddings, RAG, explanations, orchestration</td><td>Owns every prompt version and the grounding rules. Nothing ungrounded ships.</td></tr>
+      <tr><td><span class="chip k5">D5 Data &amp; Delivery</span></td><td>Manjusha</td><td>Adapters, OAuth, seed data, integration tests, Docker, CI, deployment</td><td>Owns the normalised social contract and the demo dataset. Keeps main deployable.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose">The name mapping carries over from the execution plan and is provisional &mdash; it is inferred from the repository's commit history. Swap it in weekend&nbsp;1 if the team disagrees; the rotation works with any assignment because it depends only on the count.</p>
+</section>
+
+<section>
+  <h2>The rotation</h2>
+  <p class="lede">Four rounds, built so that each person visits each of the four domains they do not steward exactly once, and every domain receives exactly one visitor per round. No gaps, no collisions, no scheduling argument.</p>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 980 328" role="img" aria-label="Rotation matrix: five people across seven weekends, showing which domain each person visits each weekend">
+        <text class="s-h" x="0" y="20">PERSON</text>
+        <text class="s-s" x="0" y="33">home domain</text>
+        <g class="s-h" text-anchor="middle">
+          <text x="200" y="20">W1</text><text x="308" y="20">W2</text><text x="416" y="20">W3</text>
+          <text x="524" y="20">W4</text><text x="632" y="20">W5</text><text x="740" y="20">W6</text><text x="848" y="20">W7</text>
+        </g>
+        <g class="s-s" text-anchor="middle">
+          <text x="200" y="33">mob</text><text x="308" y="33">round 1</text><text x="416" y="33">round 2</text>
+          <text x="524" y="33">round 3</text><text x="632" y="33">round 4</text><text x="740" y="33">gap-fill</text><text x="848" y="33">home</text>
+        </g>
+        <line x1="0" y1="42" x2="912" y2="42" stroke="var(--lineStrong)" stroke-width="1.2"/>
+
+        <!-- rows -->
+        <g class="s-n">
+          <text x="0" y="68">Harshit</text><text x="0" y="128">Lakshmi</text><text x="0" y="188">Mohit</text>
+          <text x="0" y="248">Mayank</text><text x="0" y="308">Manjusha</text>
+        </g>
+        <g>
+          <rect x="70" y="54" width="70" height="20" rx="4" fill="var(--d1s)" stroke="var(--d1)"/>
+          <text class="s-s" x="105" y="68" text-anchor="middle" fill="var(--d1)">D1 PLATFORM</text>
+          <rect x="70" y="114" width="70" height="20" rx="4" fill="var(--d2s)" stroke="var(--d2)"/>
+          <text class="s-s" x="105" y="128" text-anchor="middle" fill="var(--d2)">D2 INTERFACE</text>
+          <rect x="70" y="174" width="70" height="20" rx="4" fill="var(--d3s)" stroke="var(--d3)"/>
+          <text class="s-s" x="105" y="188" text-anchor="middle" fill="var(--d3)">D3 MODEL</text>
+          <rect x="70" y="234" width="70" height="20" rx="4" fill="var(--d4s)" stroke="var(--d4)"/>
+          <text class="s-s" x="105" y="248" text-anchor="middle" fill="var(--d4)">D4 LANGUAGE</text>
+          <rect x="70" y="294" width="70" height="20" rx="4" fill="var(--d5s)" stroke="var(--d5)"/>
+          <text class="s-s" x="105" y="308" text-anchor="middle" fill="var(--d5)">D5 DATA</text>
+        </g>
+
+        <!-- W1 mob column -->
+        <g>
+          <rect x="152" y="50" width="96" height="272" rx="7" fill="var(--surface2)" stroke="var(--lineStrong)" stroke-dasharray="4 3"/>
+          <text class="s-l" x="200" y="178" text-anchor="middle">whole team,</text>
+          <text class="s-l" x="200" y="192" text-anchor="middle">one slice</text>
+        </g>
+
+        <!-- helper: cells -->
+        <!-- Harshit row y=52 -->
+        <g>
+          <rect x="260" y="52" width="96" height="30" rx="6" fill="var(--d2s)" stroke="var(--d2)"/><text class="s-l" x="308" y="71" text-anchor="middle" fill="var(--d2)">D2 Interface</text>
+          <rect x="368" y="52" width="96" height="30" rx="6" fill="var(--d3s)" stroke="var(--d3)"/><text class="s-l" x="416" y="71" text-anchor="middle" fill="var(--d3)">D3 Model</text>
+          <rect x="476" y="52" width="96" height="30" rx="6" fill="var(--d4s)" stroke="var(--d4)"/><text class="s-l" x="524" y="71" text-anchor="middle" fill="var(--d4)">D4 Language</text>
+          <rect x="584" y="52" width="96" height="30" rx="6" fill="var(--d5s)" stroke="var(--d5)"/><text class="s-l" x="632" y="71" text-anchor="middle" fill="var(--d5)">D5 Data</text>
+        </g>
+        <g>
+          <rect x="260" y="112" width="96" height="30" rx="6" fill="var(--d3s)" stroke="var(--d3)"/><text class="s-l" x="308" y="131" text-anchor="middle" fill="var(--d3)">D3 Model</text>
+          <rect x="368" y="112" width="96" height="30" rx="6" fill="var(--d4s)" stroke="var(--d4)"/><text class="s-l" x="416" y="131" text-anchor="middle" fill="var(--d4)">D4 Language</text>
+          <rect x="476" y="112" width="96" height="30" rx="6" fill="var(--d5s)" stroke="var(--d5)"/><text class="s-l" x="524" y="131" text-anchor="middle" fill="var(--d5)">D5 Data</text>
+          <rect x="584" y="112" width="96" height="30" rx="6" fill="var(--d1s)" stroke="var(--d1)"/><text class="s-l" x="632" y="131" text-anchor="middle" fill="var(--d1)">D1 Platform</text>
+        </g>
+        <g>
+          <rect x="260" y="172" width="96" height="30" rx="6" fill="var(--d4s)" stroke="var(--d4)"/><text class="s-l" x="308" y="191" text-anchor="middle" fill="var(--d4)">D4 Language</text>
+          <rect x="368" y="172" width="96" height="30" rx="6" fill="var(--d5s)" stroke="var(--d5)"/><text class="s-l" x="416" y="191" text-anchor="middle" fill="var(--d5)">D5 Data</text>
+          <rect x="476" y="172" width="96" height="30" rx="6" fill="var(--d1s)" stroke="var(--d1)"/><text class="s-l" x="524" y="191" text-anchor="middle" fill="var(--d1)">D1 Platform</text>
+          <rect x="584" y="172" width="96" height="30" rx="6" fill="var(--d2s)" stroke="var(--d2)"/><text class="s-l" x="632" y="191" text-anchor="middle" fill="var(--d2)">D2 Interface</text>
+        </g>
+        <g>
+          <rect x="260" y="232" width="96" height="30" rx="6" fill="var(--d5s)" stroke="var(--d5)"/><text class="s-l" x="308" y="251" text-anchor="middle" fill="var(--d5)">D5 Data</text>
+          <rect x="368" y="232" width="96" height="30" rx="6" fill="var(--d1s)" stroke="var(--d1)"/><text class="s-l" x="416" y="251" text-anchor="middle" fill="var(--d1)">D1 Platform</text>
+          <rect x="476" y="232" width="96" height="30" rx="6" fill="var(--d2s)" stroke="var(--d2)"/><text class="s-l" x="524" y="251" text-anchor="middle" fill="var(--d2)">D2 Interface</text>
+          <rect x="584" y="232" width="96" height="30" rx="6" fill="var(--d3s)" stroke="var(--d3)"/><text class="s-l" x="632" y="251" text-anchor="middle" fill="var(--d3)">D3 Model</text>
+        </g>
+        <g>
+          <rect x="260" y="292" width="96" height="30" rx="6" fill="var(--d1s)" stroke="var(--d1)"/><text class="s-l" x="308" y="311" text-anchor="middle" fill="var(--d1)">D1 Platform</text>
+          <rect x="368" y="292" width="96" height="30" rx="6" fill="var(--d2s)" stroke="var(--d2)"/><text class="s-l" x="416" y="311" text-anchor="middle" fill="var(--d2)">D2 Interface</text>
+          <rect x="476" y="292" width="96" height="30" rx="6" fill="var(--d3s)" stroke="var(--d3)"/><text class="s-l" x="524" y="311" text-anchor="middle" fill="var(--d3)">D3 Model</text>
+          <rect x="584" y="292" width="96" height="30" rx="6" fill="var(--d4s)" stroke="var(--d4)"/><text class="s-l" x="632" y="311" text-anchor="middle" fill="var(--d4)">D4 Language</text>
+        </g>
+
+        <!-- W6 gap-fill + W7 home -->
+        <g>
+          <rect x="692" y="50" width="96" height="272" rx="7" fill="var(--warnSoft)" stroke="var(--warn)" stroke-dasharray="4 3"/>
+          <text class="s-l" x="740" y="172" text-anchor="middle" fill="var(--warn)">weakest</text>
+          <text class="s-l" x="740" y="186" text-anchor="middle" fill="var(--warn)">domain,</text>
+          <text class="s-l" x="740" y="200" text-anchor="middle" fill="var(--warn)">self-chosen</text>
+          <rect x="800" y="50" width="96" height="272" rx="7" fill="var(--okSoft)" stroke="var(--ok)"/>
+          <text class="s-l" x="848" y="178" text-anchor="middle" fill="var(--ok)">home domain,</text>
+          <text class="s-l" x="848" y="192" text-anchor="middle" fill="var(--ok)">freeze</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Every row contains every colour: each person builds in all five domains. Every column contains every colour once: no domain is ever left without a steward <em>and</em> no domain receives two visitors at once. The rule is simply <code>visit = (home + round) mod 5</code>.</figcaption>
+  </figure>
+
+  <div class="note">
+    <span class="t">Read the matrix in one line</span>
+    <p>You steward your home domain every single weekend. On weekends 2&ndash;5 you additionally spend Saturday building in one other domain, moving one step around the ring each round. Weekend&nbsp;1 is a shared build with no rotation; weekend&nbsp;6 you choose your own weakest area; weekend&nbsp;7 everyone is home and nothing new is written.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The weekend shape under rotation</h2>
+  <p class="lede">The Friday&ndash;Sunday rhythm from the execution plan is unchanged. What changes is that Saturday belongs to a different domain than Friday and Sunday do &mdash; roughly seven of every sixteen hours, or 44% of the project, is spent outside your home domain.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>When</th><th>Hours</th><th>Mode</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td><b>Friday 18:00</b></td><td class="num">0.5</td><td><span class="chip kPlain">team</span></td><td>Stand-up. Each person names the one thing they will finish by Sunday in each mode.</td></tr>
+      <tr><td><b>Friday 18:30</b></td><td class="num">0.5</td><td><span class="chip kPlain">handover</span></td><td><b>The rotation ritual.</b> Steward walks the visitor through their domain for thirty minutes &mdash; strictly time-boxed. Five pairs, in parallel, all done by 19:00.</td></tr>
+      <tr><td><b>Friday 19:00</b></td><td class="num">2</td><td><span class="chip kOk">home</span></td><td>Steward work. Small, independent, finishable. No new architecture on a Friday.</td></tr>
+      <tr><td><b>Saturday</b></td><td class="num">7</td><td><span class="chip kWarn">visiting</span></td><td><b>The rotation block.</b> First two hours paired with the steward at one keyboard; remaining five solo, with the steward reachable. One vertical slice, chosen so it is finishable.</td></tr>
+      <tr><td><b>Sunday 10:00</b></td><td class="num">3</td><td><span class="chip kWarn">visiting</span></td><td>Finish the slice, write its tests, open the PR. Steward reviews it the same morning, not on Monday.</td></tr>
+      <tr><td><b>Sunday 14:00</b></td><td class="num">2.5</td><td><span class="chip kOk">home</span></td><td>Back to your own domain. Integrate what the visitor built. Fix what their PR exposed.</td></tr>
+      <tr><td><b>Sunday 17:30</b></td><td class="num">0.25</td><td><span class="chip kPlain">solo</span></td><td>Field notes: ten lines into <code>docs/domains/&lt;domain&gt;/field-notes.md</code>, plus your contribution log.</td></tr>
+      <tr><td><b>Sunday 18:00</b></td><td class="num">0.25</td><td><span class="chip kPlain">team</span></td><td>Merge freeze, then run the weekend gate together on one machine.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>How to run the thirty-minute handover</h3>
+  <p class="prose">This is the mechanism the whole model rests on, and it only works because it is prepared in advance. In weekend&nbsp;1 every steward writes a one-page <code>docs/domains/&lt;domain&gt;/README.md</code> answering five fixed questions. From weekend&nbsp;2 the handover is a walkthrough of that page plus the specific slice.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Minutes</th><th>Steward does</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0&ndash;5</td><td>Open the domain README. Name the three files that matter most and what each is for.</td></tr>
+      <tr><td class="num">5&ndash;12</td><td>Run the domain's tests live. A visitor who has seen the tests pass knows what &ldquo;working&rdquo; looks like.</td></tr>
+      <tr><td class="num">12&ndash;20</td><td>Walk one existing example of the slice pattern end to end &mdash; the thing the visitor is about to copy.</td></tr>
+      <tr><td class="num">20&ndash;26</td><td>Name the traps. &ldquo;Never commit inside a repository.&rdquo; &ldquo;The encoder is a singleton.&rdquo; &ldquo;Re-embed after any profile write.&rdquo; These are the field notes from previous visitors.</td></tr>
+      <tr><td class="num">26&ndash;30</td><td>Agree the exact slice and its definition of done. Write it in the issue before you stop talking.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The five questions every domain README answers</h3>
+  <ol class="tight">
+    <li>What is this domain responsible for, in two sentences, and what is explicitly <em>not</em> its job?</li>
+    <li>Which three files should a newcomer read first, in what order?</li>
+    <li>How do I run just this domain's tests, and what does a healthy run look like?</li>
+    <li>What is the standard shape of a change here &mdash; the pattern to copy?</li>
+    <li>What are the three ways people have broken this so far?</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Weekend by weekend</h2>
+  <p class="lede">The <em>what</em> lives in the execution plan and the Build Manual &mdash; flow IDs below refer to Part&nbsp;7 of the manual. This section says who does it, in which mode, and what they are learning by doing it.</p>
+
+  <!-- W1 -->
+  <article class="wk">
+    <header><span class="no">01</span><span class="ttl">One slice, five pairs of hands</span><span class="dates">FRI 25 &ndash; SUN 27 SEP</span><span class="chip kPlain">no rotation</span></header>
+    <div class="wkgoal"><b>Goal:</b> every person has seen one request travel the entire stack before anyone specialises. This is the highest-value cross-training investment in the project and it is worth spending a whole Saturday on.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Session</th><th>Who</th><th>What</th></tr></thead>
+      <tbody>
+        <tr><td><b>Fri</b> 3 h</td><td>all five</td><td>Close the three decisions from Part&nbsp;1 of the manual (45 min). Then each person writes their <b>domain README</b> &mdash; the five questions above. This page is what makes every later handover cheap.</td></tr>
+        <tr><td><b>Sat</b> 7 h</td><td>all five, <b>one keyboard</b></td><td><b>Mob the walking skeleton.</b> Build one vertical slice together: <code>POST /auth/register</code> &rarr; <code>users</code> + <code>user_roles</code> &rarr; JWT &rarr; <code>GET /me</code> &rarr; a React screen that shows both roles active. Rotate the driver every 25 minutes; everyone types. Nobody researches privately &mdash; questions are asked out loud.</td></tr>
+        <tr><td><b>Sun</b> 6 h</td><td>pairs</td><td>Split into pairs and extend: <span class="chip k1">Harshit + Manjusha</span> migration <code>0002</code>, deps and role guards &middot; <span class="chip k2">Lakshmi + Mayank</span> login screen, auth store, role switcher, first four components &middot; <span class="chip k3">Mohit</span> label rubric v1 and <code>compute_completeness</code> with tests.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Dual-role register &rarr; login &rarr; switch mode &rarr; 403 from the other mode's endpoint, demonstrated by <b>a person who did not write the auth code</b>. Five domain READMEs committed. <code>docker compose up --build</code> works on two laptops.</span></div>
+  </article>
+
+  <!-- W2 -->
+  <article class="wk">
+    <header><span class="no">02</span><span class="ttl">Profiles, seed data &mdash; rotation round 1</span><span class="dates">FRI 2 &ndash; SUN 4 OCT</span><span class="chip kGap">mid-sem Sat 3 Oct</span></header>
+    <div class="wkgoal"><b>Goal:</b> real data in the database and creator profiles working end to end. Rotation starts. <b>Mid-sem review is Saturday</b> &mdash; present the actual state, and take the two hours it costs out of Friday.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Person</th><th>Home thread &mdash; Fri &amp; Sun pm</th><th>Saturday visit</th><th>Skill gained</th></tr></thead>
+      <tbody>
+        <tr><td>Harshit</td><td><span class="chip k1">D1</span> migrations 0003&ndash;0005; creator profile CRUD as the reference slice (F2)</td><td><span class="chip k2">D2</span> builds the rate-card editor screen against his own API</td><td>React forms, <code>react-hook-form</code>, seeing his own API from the consumer side</td></tr>
+        <tr><td>Lakshmi</td><td><span class="chip k2">D2</span> creator profile wizard, three steps</td><td><span class="chip k3">D3</span> writes three feature functions in <code>build_pair_features</code> with unit tests</td><td>What a feature actually is; why missingness is a signal</td></tr>
+        <tr><td>Mohit</td><td><span class="chip k3">D3</span> feature builder skeleton, <code>FEATURE_VERSION</code>, split strategy</td><td><span class="chip k4">D4</span> writes 20 campaign briefs and the extraction schema draft</td><td>Constrained-output schemas; why a parsed field needs a confidence</td></tr>
+        <tr><td>Mayank</td><td><span class="chip k4">D4</span> encoder singleton; representation builder offline (F5)</td><td><span class="chip k5">D5</span> pairs on <code>scripts/seed_data.py</code> &mdash; loads the 200 collected creators</td><td>The normalised contract; provenance flags; why synthetic must be labelled</td></tr>
+        <tr><td>Manjusha</td><td><span class="chip k5">D5</span> shrink <code>data/raw/</code> below 40&nbsp;MB; YouTube adapter behind the contract</td><td><span class="chip k1">D1</span> writes the preferences upsert slice (F3) &mdash; migration to endpoint</td><td>SQLAlchemy 2, Alembic, the service/repository split</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">200 real creators and 20 campaigns seeded in one command. A creator profile with a rate card created through the UI. Clean clone under 60&nbsp;MB. <b>Rotation check:</b> every Saturday PR was reviewed and merged by its steward before 18:00.</span></div>
+  </article>
+
+  <!-- W3 -->
+  <article class="wk">
+    <header><span class="no">03</span><span class="ttl">Eligibility and the first ranked list &mdash; round 2</span><span class="dates">FRI 9 &ndash; SUN 11 OCT</span></header>
+    <div class="wkgoal"><b>Goal:</b> a brand clicks Generate and gets ranked creators with stored components and stored exclusion reasons. Rule-based scoring is fine &mdash; the endpoint shape will not change when the model arrives.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Person</th><th>Home thread</th><th>Saturday visit</th><th>Skill gained</th></tr></thead>
+      <tbody>
+        <tr><td>Harshit</td><td><span class="chip k1">D1</span> migrations 0006&ndash;0007; eligibility service R1&ndash;R8; the discovery pipeline shell</td><td><span class="chip k3">D3</span> implements P@K and NDCG@K with hand-computed tests</td><td>Ranking metrics from the inside &mdash; why NDCG is not accuracy</td></tr>
+        <tr><td>Lakshmi</td><td><span class="chip k2">D2</span> discover grid, score bars, freshness stamps</td><td><span class="chip k4">D4</span> content clustering &rarr; <code>creator_content_clusters</code></td><td>Embeddings, KMeans, what a multi-vertical creator vector means</td></tr>
+        <tr><td>Mohit</td><td><span class="chip k3">D3</span> E3 semantic-only; the metrics harness; E1 vs E2 vs E3 table</td><td><span class="chip k5">D5</span> YouTube OAuth round trip, token encryption at rest</td><td>OAuth flows, secret handling, why tokens never reach React</td></tr>
+        <tr><td>Mayank</td><td><span class="chip k4">D4</span> representation rebuild as a background task, atomic version swap</td><td><span class="chip k1">D1</span> builds <code>GET /campaigns/{id}/exclusions</code> end to end</td><td>Repository patterns, pagination, the common error shape</td></tr>
+        <tr><td>Manjusha</td><td><span class="chip k5">D5</span> sync writes snapshots; sponsored-vs-organic classifier; Instagram Graph POC</td><td><span class="chip k2">D2</span> builds the exclusions audit view</td><td>TanStack Query, component composition, empty and error states</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Recommendations generated in under two seconds; 75 <code>match_scores</code> rows persisted with components and versions; every excluded creator has a row naming its rule. <b>Rotation check:</b> ask each person to explain, in one sentence, what they learned on Saturday. Vague answers mean the slice was too small.</span></div>
+  </article>
+
+  <!-- W4 -->
+  <article class="wk">
+    <header><span class="no">04</span><span class="ttl">Both directions and the reciprocal score &mdash; round 3</span><span class="dates">FRI 16 &ndash; SUN 18 OCT</span><span class="chip kPlain">milestone</span></header>
+    <div class="wkgoal"><b>Goal:</b> the product becomes genuinely two-sided, and the proposal state machine works from both entry points. This is the weekend where the research claim first becomes demonstrable.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Person</th><th>Home thread</th><th>Saturday visit</th><th>Skill gained</th></tr></thead>
+      <tbody>
+        <tr><td>Harshit</td><td><span class="chip k1">D1</span> migration 0008; inverse eligibility (F8); the proposal state machine (F10)</td><td><span class="chip k4">D4</span> writes the explanation prompt and its numeric validator</td><td>Prompt versioning; how hallucination is caught mechanically, not by trust</td></tr>
+        <tr><td>Lakshmi</td><td><span class="chip k2">D2</span> the opportunity feed &mdash; the creator-side surface that does not exist in the wireframes</td><td><span class="chip k5">D5</span> integration tests covering both discovery directions</td><td>pytest fixtures, seeded-database testing, what an integration test proves</td></tr>
+        <tr><td>Mohit</td><td><span class="chip k3">D3</span> creator-side utility; <code>reciprocal()</code> with all four methods; <b>first E5 run</b></td><td><span class="chip k1">D1</span> builds <code>POST /proposals/{id}/counter</code> with its version append</td><td>Transaction boundaries; why commercial history is never updated in place</td></tr>
+        <tr><td>Mayank</td><td><span class="chip k4">D4</span> LLM adapter, structured extraction, brief parser v1 (F6)</td><td><span class="chip k2">D2</span> builds both proposal composers from wireframe 07</td><td>Controlled forms, optimistic updates, role-aware rendering</td></tr>
+        <tr><td>Manjusha</td><td><span class="chip k5">D5</span> Instagram adapter to permitted depth; gold-set outreach; seed toward 340</td><td><span class="chip k3">D3</span> implements mutual NDCG@5 and the one-sided mismatch rate</td><td>Two-sided evaluation; why a brand-only metric hides the failure mode</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">The convergence demo: a brand finds a creator, and that creator independently finds that campaign in their own feed. One proposal, one counter, one accept, one collaboration row. <b>Rotation check &mdash; the important one:</b> every person can now name which table their Saturday work wrote to. If anyone cannot, the model is producing tourists and the next round needs bigger slices.</span></div>
+  </article>
+
+  <!-- W5 -->
+  <article class="wk">
+    <header><span class="no">05</span><span class="ttl">Trained model, explanations, RAG &mdash; round 4</span><span class="dates">FRI 23 &ndash; SUN 25 OCT</span><span class="chip kPlain">result</span></header>
+    <div class="wkgoal"><b>Goal:</b> the headline experimental result exists on held-out data, and the AI layer becomes visible in the product. Last rotation round &mdash; after this everyone has touched all five domains.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Person</th><th>Home thread</th><th>Saturday visit</th><th>Skill gained</th></tr></thead>
+      <tbody>
+        <tr><td>Harshit</td><td><span class="chip k1">D1</span> document upload + background ingest; model loading from <code>model_versions</code>; performance pass</td><td><span class="chip k5">D5</span> Docker smoke test in CI; cloud deployment dry run</td><td>CI pipelines, container builds, what breaks between laptop and cloud</td></tr>
+        <tr><td>Lakshmi</td><td><span class="chip k2">D2</span> confirm-requirements screen; the &ldquo;Why this match?&rdquo; panel</td><td><span class="chip k1">D1</span> builds <code>POST /campaigns/{id}/knowledge/query</code> end to end</td><td>Background tasks, file handling, owner-scoped queries</td></tr>
+        <tr><td>Mohit</td><td><span class="chip k3">D3</span> train LR / RF / XGBoost; register versions; <b>E4 vs E5 held-out &mdash; the result</b></td><td><span class="chip k2">D2</span> builds the document upload and policy Q&amp;A screen</td><td>Async UI states; rendering a cited source; degraded banners</td></tr>
+        <tr><td>Mayank</td><td><span class="chip k4">D4</span> explanation generator; RAG ingest and retriever; the refusal path</td><td><span class="chip k3">D3</span> runs the error analysis on E5's losses against E4</td><td>Reading a confusion pattern; where a reciprocal score costs relevance</td></tr>
+        <tr><td>Manjusha</td><td><span class="chip k5">D5</span> end-to-end suite for both traces; prompt-injection fixture; gold data loaded</td><td><span class="chip k4">D4</span> builds the RAG evaluation set &mdash; 30 questions with known answers</td><td>Retrieval metrics; groundedness; why a confident unsourced answer is a bug</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">A results table for E1&ndash;E5 on held-out data. Zero hallucinated figures across 20 sampled explanations. A RAG answer citing a page, and a question correctly refused. <b>Rotation complete:</b> fill in the skills matrix together and use it to choose weekend 6.</span></div>
+  </article>
+
+  <!-- W6 -->
+  <article class="wk">
+    <header><span class="no">06</span><span class="ttl">Gap-fill and hardening</span><span class="dates">FRI 30 OCT &ndash; SUN 1 NOV</span><span class="chip kWarn">self-directed</span></header>
+    <div class="wkgoal"><b>Goal:</b> each person returns to the domain where the skills matrix says they are weakest and does one more substantial slice there &mdash; this time without a pairing session, which is the actual test of whether the rotation worked. Meanwhile the system gets hardened.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Mode</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td><b>Choosing</b></td><td>On Friday, each person names the domain where they scored themselves lowest in weekend 5 and claims one open slice there. Two people may not pick the same domain &mdash; first claim wins, and the second person takes their next-lowest. It resolves in five minutes.</td></tr>
+        <tr><td><b>Working</b></td><td><b>No pairing hour.</b> The steward answers questions but does not sit down. If the visitor can ship a slice unaided in a domain they had never touched six weeks earlier, the model worked and that sentence belongs in the report.</td></tr>
+        <tr><td><b>Remaining work</b></td><td>Fairness re-ranking and E6 with its relevance cost &middot; cold-start experiment &middot; collaboration kanban &middot; degraded banners everywhere &middot; offline demo mode &middot; failure drills with every external key removed &middot; deployment live &middot; demo script written and timed once.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Full demo runs with the LLM key and both social API keys removed, with visible degraded banners. E6 reported with its relevance trade-off. Deployed URL reachable. Every person has shipped unaided in a domain that was not theirs in September.</span></div>
+  </article>
+
+  <!-- W7 -->
+  <article class="wk">
+    <header><span class="no">07</span><span class="ttl">Home, freeze and the story</span><span class="dates">FRI 6 &ndash; SUN 8 NOV</span><span class="chip kOk">freeze</span></header>
+    <div class="wkgoal"><b>Goal:</b> everyone back in their home domain. Nothing new is built. Friday 18:00 is feature freeze &mdash; after that, only fixes with a failing test attached.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Person</th><th>Home domain, all weekend</th></tr></thead>
+      <tbody>
+        <tr><td>Harshit <span class="chip k1">D1</span></td><td>Bug triage; final OpenAPI export; ADRs 011&ndash;014; the architecture section of the report</td></tr>
+        <tr><td>Lakshmi <span class="chip k2">D2</span></td><td>Walk every screen against the demo script; keyboard and contrast pass; screenshots; one rehearsal recording as insurance</td></tr>
+        <tr><td>Mohit <span class="chip k3">D3</span></td><td><b>Open the held-out test set once.</b> Final E1&ndash;E6 numbers; results, limitations and negative findings</td></tr>
+        <tr><td>Mayank <span class="chip k4">D4</span></td><td>Final extraction, explanation and RAG evaluation on the 40 sealed briefs; the latency and cost table from <code>ai_execution_logs</code></td></tr>
+        <tr><td>Manjusha <span class="chip k5">D5</span></td><td>Frozen demo dataset; final run on the deployed instance; two timed team rehearsals including the failure path</td></tr>
+      </tbody>
+    </table></div>
+    <div class="gate"><span class="t">Sunday gate</span><span class="body">Clean clone, one command, working demo. Final results table. Deck and report draft complete. Each person can explain their home domain in depth, sketch the other four from memory, and name one thing that did not work.</span></div>
+  </article>
+</section>
+
+<section>
+  <h2>The skills matrix</h2>
+  <p class="lede">Fill this in together on the Sunday of weekends 1, 5 and 7. It takes ten minutes, it makes the weekend&nbsp;6 choice objective rather than a negotiation, and the three snapshots become a genuine learning-outcome exhibit for the report.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Level</th><th>Means</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td><span class="lvl l0">0</span></td><td>Never touched it</td><td>&mdash;</td></tr>
+      <tr><td><span class="lvl l2">2</span></td><td>Can build in it with the steward available</td><td>One merged PR in that domain</td></tr>
+      <tr><td><span class="lvl l3">3</span></td><td>Can build in it unaided</td><td>One merged PR with no steward questions asked</td></tr>
+      <tr><td><span class="lvl l4">4</span></td><td>Can teach it and decide in it</td><td>Wrote the domain README; reviewed others' PRs there</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Target state by weekend 7</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Skill</th><th>Domain</th><th>Harshit</th><th>Lakshmi</th><th>Mohit</th><th>Mayank</th><th>Manjusha</th></tr></thead>
+    <tbody>
+      <tr><td>SQLAlchemy 2 &amp; Alembic</td><td><span class="chip k1">D1</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>FastAPI service layering</td><td><span class="chip k1">D1</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>Auth, JWT, role guards</td><td><span class="chip k1">D1</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>React + TypeScript forms</td><td><span class="chip k2">D2</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>Server state &amp; caching</td><td><span class="chip k2">D2</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>Feature engineering</td><td><span class="chip k3">D3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>Ranking models &amp; XGBoost</td><td><span class="chip k3">D3</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l2">2</span></td></tr>
+      <tr><td>Ranking evaluation</td><td><span class="chip k3">D3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>Embeddings &amp; pgvector</td><td><span class="chip k4">D4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l2">2</span></td></tr>
+      <tr><td>LLM structured output</td><td><span class="chip k4">D4</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l2">2</span></td></tr>
+      <tr><td>RAG &amp; grounding</td><td><span class="chip k4">D4</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l4">4</span></td><td class="ctr"><span class="lvl l3">3</span></td></tr>
+      <tr><td>OAuth &amp; external APIs</td><td><span class="chip k5">D5</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l4">4</span></td></tr>
+      <tr><td>Docker, CI, deployment</td><td><span class="chip k5">D5</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l2">2</span></td><td class="ctr"><span class="lvl l4">4</span></td></tr>
+      <tr><td>Testing &amp; fixtures</td><td><span class="chip k5">D5</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l3">3</span></td><td class="ctr"><span class="lvl l4">4</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose"><b>The target in one line:</b> nobody below 2 anywhere, everybody at 3 or better in at least eight of the fourteen, and each person at 4 in their home domain. That is a defensible claim about what a five-person team learned, and it is measurable rather than asserted.</p>
+</section>
+
+<section>
+  <h2>Rules that keep rotation safe</h2>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Rule</th><th>Why it exists</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><b>Visitors implement; stewards decide.</b> A visitor may write any code in the domain's established pattern. A visitor may not introduce a new pattern, rename a shared concept, change a schema, or add a dependency.</td><td>This is the entire defence against architectural drift, and it costs nothing.</td></tr>
+      <tr><td class="num">2</td><td><b>The steward is a required reviewer</b> on every PR in their domain, and reviews it the same weekend.</td><td>A review on Wednesday is a review nobody acts on.</td></tr>
+      <tr><td class="num">3</td><td><b>Schema changes go through D1 regardless of who wrote them.</b> A visitor may author a migration; Harshit merges it.</td><td>One inconsistent migration costs more than a weekend of rotation gains.</td></tr>
+      <tr><td class="num">4</td><td><b>One slice per visit, agreed in writing before Saturday starts.</b> If it is not finishable in nine hours, it is the wrong slice.</td><td>Unfinished visiting work is the worst kind &mdash; the author leaves and the steward inherits half a thing.</td></tr>
+      <tr><td class="num">5</td><td><b>Tests are the handover.</b> A visiting PR without tests does not merge, even if the code is right.</td><td>The tests are what let the steward maintain it after the visitor moves on.</td></tr>
+      <tr><td class="num">6</td><td><b>Field notes are part of the PR</b>, not an afterthought.</td><td>Ten lines from the last visitor are worth more to the next one than an hour of the steward's time.</td></tr>
+      <tr><td class="num">7</td><td><b>If a weekend gate fails, the next weekend's rotation is cancelled.</b> Everyone stays home until the gate passes.</td><td>Rotation is the flexible thing in this plan. The gates are not.</td></tr>
+      <tr><td class="num">8</td><td><b>Nobody visits the domain that is behind.</b> If D3 is a weekend late, the D3 steward keeps their Saturday.</td><td>Teaching costs the steward time exactly when they have none.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>What it costs, and what you cut to pay for it</h2>
+  <p class="lede">Cross-training is not free and pretending otherwise is how the plan fails in week 5. Here is the bill, and the scope that pays it. The Wall entering scope adds roughly 20 hours on top, so the cut list below now has to cover about 80.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Cost</th><th>Calculation</th><th>Person-hours</th></tr></thead>
+    <tbody>
+      <tr><td>Handover ritual</td><td>30 min &times; 2 people &times; 20 handovers</td><td class="num">20</td></tr>
+      <tr><td>Pairing overhead</td><td>Steward's 2 paired hours &times; 5 &times; 4 rounds, roughly half of it recovered as review time not spent later</td><td class="num">20</td></tr>
+      <tr><td>Visitor ramp-up</td><td>140 visiting hours at roughly 75% effective productivity</td><td class="num">35</td></tr>
+      <tr><td>Field notes &amp; matrix</td><td>15 min &times; 5 &times; 7 weekends, minus what it saves on the contribution log</td><td class="num">5</td></tr>
+      <tr><td><b>Total</b></td><td><b>out of ~560 person-hours</b></td><td class="num"><b>~80 &nbsp;(14%)</b></td></tr>
+      <tr><td><b>Recovered</b></td><td>Weekend 1's mob day removes most week-2 and week-3 onboarding friction; five people who can review any PR cut review latency for the whole project</td><td class="num"><b>&minus;20</b></td></tr>
+      <tr><td><b>Net</b></td><td>&mdash;</td><td class="num"><b>~60 &nbsp;(11%)</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The cut list, in cut order</h3>
+  <p class="prose">Take these from the top until 60 hours are paid. Every item is a stretch feature &mdash; the spine from the Build Manual and all six ranking experiments survive intact, which is what the marks actually depend on.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Order</th><th>Cut</th><th>Hours</th><th>What you say instead</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Agreement drafting and dual approval (F10 step 5&ndash;6)</td><td class="num">14</td><td>Designed and specified; the grounding mechanism is demonstrated by the explanation feature instead</td></tr>
+      <tr><td class="num">2</td><td>Collaboration messaging</td><td class="num">6</td><td>Out of MVP scope by decision, not by accident &mdash; the plan documents already say messaging is minimal</td></tr>
+      <tr><td class="num">3</td><td>Wall reactions, follows and the topic filter &mdash; ship posts, comments and the thread&rarr;proposal bridge only</td><td class="num">10</td><td>The community surface exists and converts to work; discovery of <em>people</em> stays manual for now</td></tr>
+      <tr><td class="num">4</td><td>Instagram beyond the Graph POC</td><td class="num">10</td><td>Two working adapters prove the integration design; the third is blocked on app review, which is true anyway</td></tr>
+      <tr><td class="num">5</td><td>Admin experiment dashboard</td><td class="num">6</td><td>The results table is generated into the report from <code>experiment_runs</code> &mdash; the data exists, the screen was decoration</td></tr>
+      <tr><td class="num">6</td><td>Counter-offer diff UI</td><td class="num">4</td><td>Versions are listed rather than diffed</td></tr>
+      <tr><td class="num">7</td><td>LangGraph &rarr; deterministic orchestration (F12)</td><td class="num">16</td><td><b>Only if still short.</b> The graph is designed, scoped and specified; the tools it would sequence all exist and are individually tested</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note o">
+    <span class="t">Why this trade is worth making</span>
+    <p>Sixty hours buys five engineers who can each build across the whole stack, review any pull request in the repository, and answer a question about any part of the system in the viva. It costs six stretch features that no examiner will ask about. For a course called <em>AI/ML in Practice</em>, the first outcome is closer to the point of the exercise than the second.</p>
+  </div>
+</section>
+
+<section>
+  <h2>When to stop rotating</h2>
+  <p class="lede">Have this conversation on the Sunday of weekend 3 and again in weekend 5, deliberately, before the signals become obvious. Abandoning rotation is a legitimate decision; drifting out of it silently is not.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Signal</th><th>What it means</th><th>Do this</th></tr></thead>
+    <tbody>
+      <tr><td>Two gates failed in a row</td><td>The plan is over capacity, and rotation is the cheapest thing to remove</td><td>Cancel rotation for weekends 5 and 6. Keep weekend 1's mob knowledge and the field notes. Say so in the report as a measured decision.</td></tr>
+      <tr><td>Visiting PRs consistently need rework</td><td>The slices are too large, or the domain README is too thin</td><td>Halve the slice size and rewrite that domain's README before cancelling anything. This is usually a briefing problem, not a people problem.</td></tr>
+      <tr><td>A steward spends Saturday teaching instead of building</td><td>The two-hour pairing cap is not being kept</td><td>Enforce the cap. After two hours the visitor works from the README and the tests, and asks asynchronously.</td></tr>
+      <tr><td>Someone rates themselves 0 in a domain after visiting it</td><td>They watched rather than built</td><td>Give them the keyboard for the whole of their next visit and give the steward a different task in the same room.</td></tr>
+      <tr><td>Merge conflicts rising sharply</td><td>Two people are editing the same files from different modes</td><td>Sequence the slices so a visitor and a steward are never in the same module on the same weekend. This is a Friday planning fix.</td></tr>
+      <tr><td>It is weekend 7</td><td>&mdash;</td><td>Rotation is already over by design. Everyone is home.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>What this gives you in the viva</h2>
+  <p class="lede">The individual examination is where this model pays off, and it pays off only if each person can do both halves.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Depth &mdash; from stewardship</h4>
+      <p>&ldquo;I own the modelling domain. I chose harmonic mean over the arithmetic and minimum alternatives, here is the comparison on held-out data, and here is the case where it costs us relevance.&rdquo; That answer needs seven weeks of continuous ownership, which is exactly what stewardship preserves.</p>
+    </div>
+    <div class="card">
+      <h4>Breadth &mdash; from rotation</h4>
+      <p>&ldquo;I also built the OAuth callback and the rate-card screen, so I can tell you why the token never reaches React and why the rate card is replace-as-a-set rather than row-by-row.&rdquo; That answer needs to have written the code, not to have read about it.</p>
+    </div>
+    <div class="card">
+      <h4>Judgement &mdash; from the field notes</h4>
+      <p>Seven weekends of ten-line entries give each person a concrete record of what surprised them and what they got wrong. &ldquo;What did not work?&rdquo; is the question that separates answers, and it cannot be improvised.</p>
+    </div>
+    <div class="card">
+      <h4>The team-level claim</h4>
+      <p>Three dated snapshots of the skills matrix turn &ldquo;we all learned a lot&rdquo; into a measured outcome with a method behind it. Put the weekend 1 and weekend 7 matrices side by side in the report appendix.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Everyone Builds Everything</b> &middot; staffing model for the BrandBridge AI capstone &middot; companion to the Build Manual and the seven-weekend execution plan &middot; compiled 20 September 2026.</p>
+  <p style="margin-top:.6em">The rotation is <code>visit = (home + round) mod 5</code> over four rounds, which gives every person all four non-home domains exactly once and every domain exactly one visitor per round. It works for any five-person assignment, so swap the names freely in weekend 1.</p>
+</footer>
+</div>
+</body>
+</html>
