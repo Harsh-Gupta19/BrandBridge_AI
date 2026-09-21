@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0.0",
+  "record_type": "creator_profile",
+  "transformed_at": "2026-09-19T10:30:00Z",
+  "creator": {
+    "creator_id": "creator:sample-aarav-fitness",
+    "display_name": "Aarav Fitness",
+    "bio": "Fitness, nutrition, and sustainable healthy-lifestyle content.",
+    "country_code": "IN",
+    "city": "Mumbai",
+    "languages": ["en", "hi"],
+    "categories": ["fitness", "nutrition"],
+    "content_topics": ["strength training", "healthy recipes", "weight management"],
+    "content_formats": ["short_video", "long_video", "image_carousel"],
+    "profile_image_url": "https://example.com/sample-aarav-fitness.jpg",
+    "is_verified_by_brandbridge": false
+  },
+  "platform_accounts": [
+    {
+      "platform": "youtube",
+      "platform_account_id": "UC_SAMPLE_AARAV",
+      "handle": "@aaravfitness",
+      "profile_url": "https://www.youtube.com/@aaravfitness",
+      "account_type": "creator",
+      "account_country_code": "IN",
+      "is_platform_verified": null,
+      "is_active": true,
+      "public_metrics": {
+        "followers": 42000,
+        "following": null,
+        "total_content": 185,
+        "total_views": 4200000
+      },
+      "sample_metrics": {
+        "sample_size": 20,
+        "sample_window_start": "2026-06-01T00:00:00Z",
+        "sample_window_end": "2026-09-15T23:59:59Z",
+        "average_views": 18000.0,
+        "median_views": 14200.0,
+        "average_likes": 980.0,
+        "average_comments": 74.0,
+        "engagement_rate_percent": 5.86,
+        "posts_last_30_days": 6,
+        "posts_last_90_days": 17,
+        "posting_frequency_per_30_days": 5.1
+      },
+      "platform_specific": {
+        "subscriber_count_hidden": false,
+        "average_duration_seconds": 312.5,
+        "short_form_ratio": 0.65,
+        "long_form_ratio": 0.35
+      },
+      "last_collected_at": "2026-09-16T08:00:00Z"
+    },
+    {
+      "platform": "instagram",
+      "platform_account_id": "IG_SAMPLE_AARAV",
+      "handle": "aaravfitness",
+      "profile_url": "https://www.instagram.com/aaravfitness/",
+      "account_type": "creator",
+      "account_country_code": null,
+      "is_platform_verified": null,
+      "is_active": true,
+      "public_metrics": {
+        "followers": 85000,
+        "following": 430,
+        "total_content": 620,
+        "total_views": null
+      },
+      "sample_metrics": {
+        "sample_size": 25,
+        "sample_window_start": "2026-07-01T00:00:00Z",
+        "sample_window_end": "2026-09-15T23:59:59Z",
+        "average_views": 31000.0,
+        "median_views": 24750.0,
+        "average_likes": 1650.0,
+        "average_comments": 92.0,
+        "engagement_rate_percent": 5.62,
+        "posts_last_30_days": 12,
+        "posts_last_90_days": 31,
+        "posting_frequency_per_30_days": 10.3
+      },
+      "platform_specific": {
+        "media_type_distribution": {
+          "reel": 0.68,
+          "image": 0.12,
+          "carousel": 0.2
+        }
+      },
+      "last_collected_at": "2026-09-16T08:15:00Z"
+    }
+  ],
+  "audience": {
+    "primary_country_code": "IN",
+    "country_distribution_percent": {
+      "IN": 82.0,
+      "AE": 5.0,
+      "US": 4.0
+    },
+    "primary_age_range": "18-30",
+    "age_distribution_percent": null,
+    "gender_distribution_percent": null,
+    "source": "creator_provided",
+    "measured_at": "2026-09-01T00:00:00Z"
+  },
+  "commercial": {
+    "currency": "INR",
+    "rate_card": {
+      "instagram_reel": 7000.0,
+      "instagram_carousel": 4500.0,
+      "youtube_short": 9000.0,
+      "youtube_video": 18000.0
+    },
+    "open_to_collaboration": true,
+    "preferred_brand_categories": ["fitness", "food", "wellness"],
+    "restricted_brand_categories": ["tobacco", "gambling"],
+    "business_contact_available": true
+  },
+  "matching_features": {
+    "semantic_text": "Fitness nutrition strength training healthy recipes weight management English Hindi",
+    "combined_followers": 127000,
+    "weighted_average_views": 25222.22,
+    "weighted_engagement_rate_percent": 5.73,
+    "active_platforms": ["youtube", "instagram"],
+    "category_vector": null,
+    "text_embedding": null
+  },
+  "data_quality": {
+    "overall_score": 0.86,
+    "profile_completeness_score": 0.92,
+    "metrics_reliability_score": 0.84,
+    "recency_score": 0.95,
+    "identity_confidence_score": 0.75,
+    "warnings": [
+      "Instagram account country is unavailable.",
+      "Detailed audience demographics were not supplied.",
+      "Cross-platform identity has not been manually verified."
+    ]
+  },
+  "provenance": {
+    "source_records": [
+      {
+        "platform": "youtube",
+        "source_file": "data/raw/youtube/brandbridge_youtube_creators.latest.json",
+        "source_record_id": "youtube:UC_SAMPLE_AARAV",
+        "collector_version": "1.0.0"
+      },
+      {
+        "platform": "instagram",
+        "source_file": "data/raw/instagram/instagram_creators.latest.json",
+        "source_record_id": "instagram:IG_SAMPLE_AARAV",
+        "collector_version": "1.0.0"
+      }
+    ],
+    "transformation_pipeline_version": "1.0.0"
+  }
+}

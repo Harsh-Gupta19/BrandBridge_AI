@@ -32,7 +32,7 @@ def main():
     )
 
     print("\nOAuth authorization successful.")
-    print("Credentials saved successfully.")
+    print("Credentials saved successfully")
     print(f"Token file: {TOKEN_FILE}")
 
     if credentials.token:

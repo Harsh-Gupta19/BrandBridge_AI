@@ -24,7 +24,7 @@ from googleapiclient.errors import HttpError
 #
 # IMPORTANT:
 # YouTube Analytics does not support fields=*.
-# Metrics are only valid with certain dimensions/reports.
+# Metrics are only valid with certain dimensions/reports
 #
 # Official documentation:
 # https://developers.google.com/youtube/analytics/channel_reports

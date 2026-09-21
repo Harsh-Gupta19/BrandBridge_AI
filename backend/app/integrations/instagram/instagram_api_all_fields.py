@@ -5,7 +5,7 @@ Purpose
 -------
 Learning/exploration collector for Instagram Professional accounts.
 
-It is intentionally NOT a production scraper. It probes a broad set of
+It is intentionally NOT a production scraper It probes a broad set of
 documented/current Instagram Graph API fields and resources and records
 unavailable fields as null with an error/status explanation.
 

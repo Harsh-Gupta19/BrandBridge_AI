@@ -6,7 +6,7 @@
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
   },
-  "description": "The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists, and channels.",
+  "description": "The YouTube Data API v3 is an API that provides access to YouTube dat, such as videos, playlists, and channels.",
   "id": "youtube:v3",
   "revision": "20260914",
   "parameters": {

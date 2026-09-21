@@ -28,7 +28,7 @@ API_VERSION = "v2"
 
 END_DATE = date.today()
 
-# YouTube Analytics data can have processing latency.
+# YouTube Analytics data can have processing latency
 # Use a safe historical range for the first test.
 START_DATE = END_DATE - timedelta(days=30)
 

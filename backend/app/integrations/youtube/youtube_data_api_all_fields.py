@@ -21,7 +21,7 @@ Output:
 
 This is an exploratory field collector. Public fields are collected with an
 API key. Owner-only/restricted fields are attempted separately and recorded
-as null + an error when the current credentials cannot access them.
+as null + an error when the current credentials cannot access them
 """
 
 from __future__ import annotations

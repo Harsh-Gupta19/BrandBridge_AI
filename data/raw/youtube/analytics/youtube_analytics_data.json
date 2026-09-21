@@ -2,7 +2,7 @@
   "source": "YouTube Analytics API",
   "api_version": "v2",
   "channel": "channel==MINE",
-  "start_date": "2026-08-20",
+  "start_date": "2026-08-22",
   "end_date": "2026-09-20",
   "report": {
     "kind": "youtubeAnalytics#resultTable",

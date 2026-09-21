@@ -18,7 +18,7 @@ load_dotenv()
 ACCESS_TOKEN = os.getenv("INSTAGRAM_ACCESS_TOKEN")
 
 if not ACCESS_TOKEN:
-    print("ERROR: INSTAGRAM_ACCESS_TOKEN not found.")
+    print("ERROR: INSTAGRAM_ACCESS_TOKEN not found")
     print("Add this to .env:")
     print("INSTAGRAM_ACCESS_TOKEN=your_token_here")
     sys.exit(1)
