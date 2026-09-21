@@ -20,6 +20,13 @@ Current examples:
 
 - `creator.sample.json`
 - `campaign.sample.json`
+- `transformed_creator.sample.json`
+
+`transformed_creator.sample.json` is the reference output for social-media
+transformers. It separates shared creator identity, normalized platform metrics,
+platform-specific fields, audience and commercial data, matching features,
+quality checks, and source provenance. Keep unavailable values as `null`; use
+zero only when the source explicitly reports zero.
 
 These files help the team build screens and understand expected data shapes before real APIs are implemented.
 
