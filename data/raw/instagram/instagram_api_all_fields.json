@@ -7,7 +7,7 @@
     "api_version": "v22.0",
     "instagram_user_id": "28627587253541998",
     "token_type": "redacted",
-    "purpose": "learning_and_exploration",
+    "purpose": "learning_and_exploration.",
     "important_note": "This is a broad field/resource explorer. Instagram does not provide a universal fields=* schema endpoint. Availability depends on API version, account type, permissions, token, and resource."
   },
   "profile": {
