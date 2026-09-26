@@ -142,6 +142,13 @@ pytest
 ruff check .
 ```
 
+The Build Manual §5.2 database migration chain (`0001` through `0009`) and its
+SQLAlchemy models are implemented. With PostgreSQL/pgvector available and
+`DATABASE_URL` configured, run `alembic upgrade head` from `backend/`.
+See [database migrations](docs/architecture/database-migrations.md) for the revision
+map, existing-data backfills, rollback limits and PostgreSQL integration tests.
+Marketplace APIs and workflows remain planned work.
+
 ## Frontend Development
 
 From `frontend/`:
