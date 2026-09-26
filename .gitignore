@@ -41,3 +41,6 @@ data/processed/
 client_secret*.json
 token*.json
 *.pickle
+
+# Local database runtime and data
+/.local/
